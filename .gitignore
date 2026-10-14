@@ -480,3 +480,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Local RestaurantSim database and SQLite temporary files
+restaurantsim.db
+restaurantsim.db-*
