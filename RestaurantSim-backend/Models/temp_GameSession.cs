@@ -9,4 +9,6 @@ public class GameSession
     public string CreatorId { get; set; } = string.Empty;
 
     public DateTime CreatedAtUtc { get; set; }
+
+    public List<Team> Teams { get; set; } = [];
 }
