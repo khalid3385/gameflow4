@@ -51,28 +51,10 @@ public class GameSessionService
                     "A profile number must be between 1 and 6.");
             }
      
-            var memberNames = requestedTeam.MemberNames
-                ?.Where(name => !string.IsNullOrWhiteSpace(name))
-                .Select(name => name!.Trim())
-                .ToList()
-                ?? [];
-     
-            if (memberNames.Count > 20)
-            {
-                throw new ArgumentException(
-                    "A team can have at most 20 names.");
-            }
-     
-            if (memberNames.Any(name => name.Length > 50))
-            {
-                throw new ArgumentException(
-                    "A member name must be at most 50 characters.");
-            }
      
             preparedTeams.Add(new PreparedTeam(
                 teamName,
-                requestedTeam.ProfileNumber,
-                memberNames));
+                requestedTeam.ProfileNumber));
         }
      
         const int maxAttempts = 5;
@@ -106,13 +88,7 @@ public class GameSessionService
                     {
                         Name = preparedTeam.Name,
                         JoinCode = GenerateDifferentCode(),
-                        ProfileNumber = preparedTeam.ProfileNumber,
-                        Members = preparedTeam.MemberNames
-                            .Select(memberName => new TeamMember
-                            {
-                                Name = memberName
-                            })
-                            .ToList()
+                        ProfileNumber = preparedTeam.ProfileNumber
                     })
                     .ToList()
             };
@@ -135,11 +111,96 @@ public class GameSessionService
         throw new InvalidOperationException(
             "Could not generate unique team codes.");
     }
+
+    public async Task<Team?> JoinTeamAsync(
+        string joinCode,
+        CancellationToken cancellationToken = default)
+    {
+        return await _db.Teams
+            .AsNoTracking()
+            .Include(team => team.Members)
+            .SingleOrDefaultAsync(
+                team => team.JoinCode == joinCode,
+                cancellationToken);
+    }
+
+public async Task<TeamMember?> AddTeamMemberAsync(
+    string joinCode,
+    string name,
+    CancellationToken cancellationToken = default)
+{
+    var team = await _db.Teams
+        .Include(team => team.Members)
+        .SingleOrDefaultAsync(
+            team => team.JoinCode == joinCode,
+            cancellationToken);
+
+    if (team is null)
+    {
+        return null;
+    }
+
+    if (team.Members.Count >= 20)
+    {
+        throw new ArgumentException(
+            "A team can have at most 20 names.");
+    }
+
+    var cleanedName = name.Trim();
+
+    if (string.IsNullOrWhiteSpace(cleanedName))
+    {
+        throw new ArgumentException(
+            "A name is required.");
+    }
+
+    if (cleanedName.Length > 50)
+    {
+        throw new ArgumentException(
+            "A name must be at most 50 characters.");
+    }
+
+    var member = new TeamMember
+    {
+        TeamId = team.Id,
+        Name = cleanedName
+    };
+
+    _db.TeamMembers.Add(member);
+
+    await _db.SaveChangesAsync(cancellationToken);
+
+    return member;
+}
+
+public async Task<bool> DeleteTeamMemberAsync(
+    int memberId,
+    string joinCode,
+    CancellationToken cancellationToken = default)
+{
+    var member = await _db.TeamMembers
+        .SingleOrDefaultAsync(
+            teamMember =>
+                teamMember.Id == memberId
+                && teamMember.Team.JoinCode == joinCode,
+            cancellationToken);
+ 
+    if (member is null)
+    {
+        return false;
+    }
+ 
+    _db.TeamMembers.Remove(member);
+ 
+    await _db.SaveChangesAsync(cancellationToken);
+ 
+    return true;
+}
+
      
     private sealed record PreparedTeam(
         string Name,
-        int ProfileNumber,
-        List<string> MemberNames);
+        int ProfileNumber);
 
     public async Task<SessionParticipant?> JoinAsync(
     string joinCode,

@@ -5,5 +5,5 @@ public record CreateSessionRequest(
 
 public record CreateTeamRequest(
     string? Name,
-    int ProfileNumber,
-    List<string?>? MemberNames);
+    int ProfileNumber);
+    
