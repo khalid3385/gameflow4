@@ -59,63 +59,6 @@ public static class SessionEndpoints
         })
         .RequireAuthorization();
 
-        endpoints.MapPost("/sessions/join", async (
-            [FromBody] JoinSessionRequest request,
-            GameSessionService service,
-            CancellationToken cancellationToken) =>
-        {
-            if (string.IsNullOrWhiteSpace(request.JoinCode)
-                || string.IsNullOrWhiteSpace(request.Nickname))
-            {
-                return Results.BadRequest(new
-                {
-                    error = "Join code and nickname are required."
-                });
-            }
-
-            var joinCode = request.JoinCode.Trim();
-            var nickname = request.Nickname.Trim();
-
-            if (joinCode.Length != 6
-                || joinCode.Any(c => c < '0' || c > '9'))
-            {
-                return Results.BadRequest(new
-                {
-                    error = "Join code must contain six digits."
-                });
-            }
-
-            if (nickname.Length > 30)
-            {
-                return Results.BadRequest(new
-                {
-                    error = "Nickname must be at most 30 characters."
-                });
-            }
-
-            var participant = await service.JoinAsync(
-                joinCode,
-                nickname,
-                cancellationToken);
-
-            if (participant is null)
-            {
-                return Results.NotFound(new
-                {
-                    error = "Session was not found."
-                });
-            }
-
-            return Results.Json(new
-            {
-                participant.Id,
-                participant.GameSessionId,
-                participant.Nickname,
-                participant.JoinedAtUtc
-            }, statusCode: StatusCodes.Status201Created);
-            })
-            .AllowAnonymous();
-
         return endpoints;
     }
 }

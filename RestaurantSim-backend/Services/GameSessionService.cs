@@ -202,33 +202,5 @@ public async Task<bool> DeleteTeamMemberAsync(
         string Name,
         int ProfileNumber);
 
-    public async Task<SessionParticipant?> JoinAsync(
-    string joinCode,
-    string nickname,
-    CancellationToken cancellationToken = default)
-    {
-        var session = await _db.GameSessions
-            .AsNoTracking()
-            .SingleOrDefaultAsync(
-                s => s.JoinCode == joinCode,
-                cancellationToken);
-
-        if (session is null)
-        {
-            return null;
-        }
-
-        var participant = new SessionParticipant
-        {
-            GameSessionId = session.Id,
-            Nickname = nickname,
-            JoinedAtUtc = DateTime.UtcNow
-        };
-
-        _db.SessionParticipants.Add(participant);
-
-        await _db.SaveChangesAsync(cancellationToken);
-
-        return participant;
-    }
+    
 }
