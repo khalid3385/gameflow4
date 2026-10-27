@@ -9,7 +9,7 @@ type FormCard = {
 const TextInput = ({ labelContent, errorContent, className,  ...rest }: FormCard) => {
   let final_class =
     (className || " ") +
-    ` h-10 border border-1 border-neutral-300 
+    ` h-11 border border-1 border-neutral-300 
     ${errorContent && "border-red-400! bg-red-100! outline-red-400"}`;
 
   if (!final_class.includes("px") && !final_class.includes("p-"))
@@ -23,7 +23,7 @@ const TextInput = ({ labelContent, errorContent, className,  ...rest }: FormCard
       {labelContent && (
         <label className="mb-1 opacity-80 text-[smaller]">{labelContent}</label>
       )}
-      <input {...rest} className={final_class} type="text" />
+      <input {...rest} className={final_class} />
       {errorContent && (
         <ErrorMessage errorContent={errorContent}/>
       )}

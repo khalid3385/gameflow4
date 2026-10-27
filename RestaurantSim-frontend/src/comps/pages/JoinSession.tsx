@@ -31,7 +31,7 @@ export default function JoinSession() {
     formState: { errors, isSubmitting },
   } = useForm<FormFields>();
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
+  const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
     try {
       const response = await fetch("/sessions/join", {
         method: "POST",
