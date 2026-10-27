@@ -15,7 +15,7 @@ const TextInput = ({ labelContent, errorContent, ...props }) => {
 
   return (
     <div className="flex flex-col">
-      {labelContent && <label className="mb-1">{labelContent}</label>}
+      {labelContent && <label className="mb-1.5 font-medium">{labelContent}</label>}
       <input {...props} className={final_class} type="text" />
       {errorContent && <p className="text-red-500  text-[smaller]">{errorContent}</p>}
     </div>

@@ -57,8 +57,13 @@ export default function JoinSession() {
   return (
     <div className="flex flex-1 items-center justify-center">
       <FormCard width="w-110">
-        <div className="mb-5 text-center">
-          <h2 className="text-xl mb-1 font-medium">Join a team</h2>
+
+        {!participant ?
+        <>
+        
+        
+        <div className="mb-10 text-center">
+          <h2 className="text-4xl mb-2 font-medium">Join a team</h2>
           <p className="opacity-70">
             Enter the code given by the host to join a team.
           </p>
@@ -92,20 +97,28 @@ export default function JoinSession() {
           />
 
           <Button
-            className="bg-blue-600 text-white h-10 mt-4"
+            className="bg-blue-700 text-white h-12 mt-4"
             type="submit"
             disabled={busy}
           >
             {busy ? "Joining…" : "Join session"}
           </Button>
         </form>
+        </>
 
-        {/* {participant && (
-          <p role="status">
-            {participant.nickname} joined session {participant.gameSessionId}.
-            Participant ID: {participant.id}
-          </p>
-        )} */}
+        : 
+          <div className="text-center">
+            <h2 className="text-4xl mb-2 font-medium">
+              You joined Session {participant.gameSessionId}
+            </h2>
+            <p className="opacity-70">Awaiting the host to start the game.</p>
+            <h3 className="mt-10 text-2xl">{participant.nickname}</h3>
+          </div>
+          // <p role="status">
+          //   {participant.nickname} joined session {participant.gameSessionId}.
+          //   Participant ID: {participant.id}
+          // </p>
+        }
       </FormCard>
     </div>
   );

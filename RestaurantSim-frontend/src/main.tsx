@@ -18,7 +18,7 @@ const router = createBrowserRouter([
     element: <RootLayout />,
     // element: <RootLayout />,
     children: [
-      { path: "/", index: true, element: <JoinSession />}, // landing page goes here
+      { path: "/join", index: true, element: <JoinSession />}, // landing page goes here
 
       { path: "*", element: <h1>page not found :(</h1> }, // not found
       { path: "foo", element: <App /> }, // not found
