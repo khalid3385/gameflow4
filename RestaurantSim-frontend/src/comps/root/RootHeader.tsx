@@ -6,7 +6,7 @@ const RootHeader = () => {
     <header className="h-15 fixed bg-white w-full border-b- border-neutral-300">
       <div className="flex items-center justify-between gap-8 h-full px-10">
         <Link to={"/"}>
-          <h1 className="tracking-widest text-lg font-medium">potatoes</h1>
+          <h1 className="tracking-widest text-xl font-medium">potatoes</h1>
         </Link>
 
         <nav className="flex justify-between items-center  h-full flex-1 gap-5">

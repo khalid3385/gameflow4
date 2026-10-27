@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
 import RootLayout from "./comps/root/RootLayout.tsx";
 import JoinSession from "./comps/pages/JoinSession.tsx";
 import {
@@ -12,6 +11,7 @@ import CreateSession from "./comps/pages/CreateSession.tsx";
 import Login from "./comps/pages/Login.tsx";
 import SignUp from "./comps/pages/SignUp.tsx";
 import Home from "./comps/pages/Home.tsx";
+import PageNotFound from "./comps/pages/PageNotFound.tsx";
 
 
 const router = createBrowserRouter([
@@ -26,8 +26,7 @@ const router = createBrowserRouter([
       { path: "/signup", index: true, element: <SignUp />}, // landing page goes here
       { path: "/create", index: true, element: <CreateSession />}, // landing page goes here
 
-      { path: "*", element: <h1>page not found :(</h1> }, // not found
-      { path: "foo", element: <App /> }, // not found
+      { path: "*", element: <PageNotFound /> }, // not found
     ],
   },
 ]);
