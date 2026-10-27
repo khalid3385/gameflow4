@@ -10,6 +10,7 @@ import {
   Outlet,
   RouterProvider,
 } from "react-router";
+import CreateSession from "./comps/pages/CreateSession.tsx";
 
 
 const router = createBrowserRouter([
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
     // element: <RootLayout />,
     children: [
       { path: "/join", index: true, element: <JoinSession />}, // landing page goes here
+      { path: "/create", index: true, element: <CreateSession />}, // landing page goes here
 
       { path: "*", element: <h1>page not found :(</h1> }, // not found
       { path: "foo", element: <App /> }, // not found

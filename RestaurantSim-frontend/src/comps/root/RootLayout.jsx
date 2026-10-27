@@ -13,7 +13,7 @@ const RootLayout = () => {
       {/* <div className="absolute p-6">
         <Link className="w-full h-full" to="/"></Link>
       </div> */}
-      <main className="bg-neutral-100 w-full pt-16 flex">
+      <main className="bg-neutral-100 w-full pt-13 flex">
       <Outlet />
       </main>
     </div>
@@ -24,9 +24,9 @@ const RootLayout = () => {
 
 const Header = () => {
     return (
-        <header className="h-16 fixed bg-white w-full border-b border-neutral-200">
+        <header className="h-13 fixed bg-white w-full border-b border-neutral-200">
             <div className="flex items-center h-full px-5" >
-                <p>foo </p>
+                <p className="tracking-widest  font-medium">gameflow</p>
             </div>
         </header>
     );

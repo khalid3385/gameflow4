@@ -1,11 +1,15 @@
 type FormCard = {
   labelContent: string;
   errorContent: string;
+  className?: string;
+
 };
 
-const TextInput = ({ labelContent, errorContent, ...props }) => {
+const TextInput = ({ labelContent, errorContent, className, ...rest }: FormCard) => {
   let final_class =
-    (props?.className || " ") + ` h-10 border border-1 border-neutral-300 `;
+    (className || " ") +
+    ` h-10 border border-1 border-neutral-300 
+    ${errorContent && "border-red-400! bg-red-100! outline-red-400"}`;
 
   if (!final_class.includes("px") && !final_class.includes("p-"))
     final_class += " px-3";
@@ -15,11 +19,31 @@ const TextInput = ({ labelContent, errorContent, ...props }) => {
 
   return (
     <div className="flex flex-col">
-      {labelContent && <label className="mb-1.5 font-medium">{labelContent}</label>}
-      <input {...props} className={final_class} type="text" />
-      {errorContent && <p className="text-red-500  text-[smaller]">{errorContent}</p>}
+      {labelContent && (
+        <label className="mb-1 opacity-80 text-[smaller]">{labelContent}</label>
+      )}
+      <input {...rest} className={final_class} type="text" />
+      {errorContent && (
+        <ErrorMessage errorContent={errorContent}/>
+      )}
     </div>
   );
 };
+
+
+
+export const ErrorMessage = ({errorContent}: {errorContent: string}) => {
+  return (
+    <div className="flex items-center gap-1.5"> 
+          {/* <div className="rounded-full bg-red-200 text-red-400  w-3.5 h-3.5 flex items-center justify-center">
+            <p className="text-[0.6rem] font-medium">!</p>
+          </div> */}
+          <p className="text-red-400 mt-0.5 text-[smaller]">{errorContent}</p>
+        </div>
+  );
+}
+
+
+
 
 export default TextInput;
