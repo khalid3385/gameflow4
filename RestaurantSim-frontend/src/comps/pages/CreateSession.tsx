@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import FormCard, { FormHeader } from "../util/FormCard";
 
-import  { ErrorMessage } from "../util/TextInput";
+import { ErrorMessage } from "../util/TextInput";
 import { SubmitButton } from "../util/Button";
 
 type CreatedSession = {
@@ -28,7 +28,7 @@ const CreateSession = () => {
   const onSubmit: SubmitHandler<FormFields> = async (data) =>
     createSession(data);
 
-  async function createSession(data) {
+  async function createSession(data: FormFields) {
     try {
       const response = await fetch("/sessions", {
         method: "POST",
@@ -104,31 +104,47 @@ const CreateSession = () => {
         </FormCard>
       ) : (
         <>
-          <div className="text-center flex flex-col justify-center items-center">
-            <p className="text-6xl text-green-500 mb-4">✓</p>
-
-            <h2 className="text-3xl mb-2 font-medium max-w-100">
-              Join at <span className="font-bold">gameflow/join.nl</span> with
-              code:
-            </h2>
-
-            <span className="font-bold text-6xl mt-5 bg-white p-5 px-6 rounded-xl">
-              {session.joinCode}
-            </span>
-          </div>
-
-          <div className="relative flex items-center justify-center flex-1 rounded-xl border border-neutral-300">
-            <h2 className="text-xl">Waiting for players...</h2>
-            <div className="absolute right-5 top-0">
-              <SubmitButton
-                disabled={isSubmitting}
-                text={isSubmitting ? "Creating..." : "Start"}
-              ></SubmitButton>
-            </div>
-          </div>
+          <WaitingRoom
+            joinCode={session?.joinCode}
+            isSubmitting={isSubmitting}
+          />
         </>
       )}
     </div>
+  );
+};
+
+const WaitingRoom = ({
+  joinCode,
+  isSubmitting,
+}: {
+  joinCode: string;
+  isSubmitting: boolean;
+}) => {
+  return (
+    <>
+      <div className="text-center flex flex-col justify-center items-center pt-15">
+        <p className="text-6xl text-green-500 mb-4">✓</p>
+
+        <h2 className="text-3xl mb-2 font-medium max-w-100">
+          Join at <span className="font-bold">gameflow/join.nl</span> with code:
+        </h2>
+
+        <span className="font-bold text-6xl mt-5 bg-white p-5 px-6 rounded-xl">
+          {joinCode}
+        </span>
+      </div>
+
+      <div className="relative flex items-center justify-center flex-1   border border-neutral-300">
+        <h2 className="text-xl">Waiting for players...</h2>
+        <div className="absolute right-5 top-0">
+          <SubmitButton
+            disabled={isSubmitting}
+            text={isSubmitting ? "Creating..." : "Start"}
+          />
+        </div>
+      </div>
+    </>
   );
 };
 
