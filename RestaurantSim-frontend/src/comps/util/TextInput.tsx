@@ -2,10 +2,11 @@ type FormCard = {
   labelContent: string;
   errorContent: string;
   className?: string;
+  placeHolder?: string;
 
 };
 
-const TextInput = ({ labelContent, errorContent, className, ...rest }: FormCard) => {
+const TextInput = ({ labelContent, errorContent, className,  ...rest }: FormCard) => {
   let final_class =
     (className || " ") +
     ` h-10 border border-1 border-neutral-300 

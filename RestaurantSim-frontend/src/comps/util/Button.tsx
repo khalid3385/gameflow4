@@ -16,4 +16,22 @@ const Button = ({ children, shadow = "shadow-sm", ...props }) => {
   );
 };
 
+export const SubmitButton = ({
+  disabled,
+  text,
+}: {
+  disabled: boolean;
+  text: string;
+}) => {
+  return (
+    <Button
+      className="bg-neutral-800 hover:bg-neutral-700 text-white h-12 mt-4"
+      type="submit"
+      disabled={disabled}
+    >
+      {text}
+    </Button>
+  );
+};
+
 export default Button;

@@ -4,6 +4,7 @@ import TextInput from "../util/TextInput";
 import Button from "../util/Button";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "../util/TextInput";
+import { SubmitButton } from "../util/Button";
 
 type FormFields = {
   code: string;
@@ -107,14 +108,10 @@ export default function JoinSession() {
                 maxLength={6}
                 // required
               />
-
-              <Button
-                className="bg-neutral-800 hover:bg-neutral-700 text-white h-12 mt-4"
-                type="submit"
+              <SubmitButton 
                 disabled={isSubmitting}
-              >
-                {isSubmitting ? "Joining…" : "Join"}
-              </Button>
+                text={isSubmitting ? "Joining…" : "Join"}
+              />
             </form>
             {errors?.request && (
               <ErrorMessage errorContent={errors?.request?.message} />
