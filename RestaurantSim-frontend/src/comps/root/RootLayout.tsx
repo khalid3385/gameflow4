@@ -1,6 +1,5 @@
 import { Link, Outlet } from "react-router";
 
-import Button from "../util/Button";
 import RootHeader from "./RootHeader"
 
 const RootLayout = () => {

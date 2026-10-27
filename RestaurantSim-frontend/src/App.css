@@ -1,6 +1,0 @@
-
-@theme {
-    @layer components {
-        .bg-app @apply bg-red-500
-    }
-}
