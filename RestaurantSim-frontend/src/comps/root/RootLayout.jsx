@@ -4,11 +4,7 @@ const RootLayout = () => {
   return (
     <div className="min-h-dvh flex">
       <Header />
-
-      {/* <div className="absolute p-6">
-        <Link className="w-full h-full" to="/"></Link>
-      </div> */}
-      <main className="bg-neutral-100- w-full pt-13 flex">
+      <main className="bg-neutral-100- w-full pt-15 flex">
         <Outlet />
       </main>
     </div>
@@ -17,19 +13,17 @@ const RootLayout = () => {
 
 const Header = () => {
   return (
-    <header className="h-13 fixed bg-white w-full border-b border-neutral-300">
+    <header className="h-15 fixed bg-white w-full border-b border-neutral-300">
       <div className="flex items-center justify-between h-full px-5">
-        <p className="tracking-widest  font-medium">gameflow</p>
+        <p className="tracking-widest text-lg font-medium">potatoes</p>
         <div className="flex gap-5">
-          {["create", "join"].map(a => 
+          {["create", "join", "login", "signUp"].map((a) => (
             <>
-            
-            <Link to={`/${a}`}>
-              <p>{a}</p>
-            </Link>
-
+              <Link to={`/${a}`}>
+                <p>{a}</p>
+              </Link>
             </>
-          )}
+          ))}
         </div>
       </div>
     </header>
