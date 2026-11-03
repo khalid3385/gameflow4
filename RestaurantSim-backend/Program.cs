@@ -37,4 +37,5 @@ app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapSessionEndpoints();
+app.MapTeamEndpoints();
 app.Run();
