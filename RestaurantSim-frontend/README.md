@@ -1,20 +1,5 @@
 # Dependencies
 
-Libraries te installeren
-```bash
-  npm i react-router
-  npm i react-router-dom
-  npm i tailwindcss @tailwindcss/vite
-```
-
-
-
-
-
-
-
-
-
 
 # React + TypeScript + Vite
 
