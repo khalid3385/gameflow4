@@ -259,6 +259,44 @@ namespace RestaurantSim.Data.Migrations
                     b.ToTable("SessionParticipants");
                 });
 
+            modelBuilder.Entity("RestaurantSim.Models.Team", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GameSessionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Profiel")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Punten")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Strategie")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("T_naam")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TeamCode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameSessionId");
+
+                    b.HasIndex("TeamCode")
+                        .IsUnique();
+
+                    b.ToTable("Teams");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -320,6 +358,15 @@ namespace RestaurantSim.Data.Migrations
                 });
 
             modelBuilder.Entity("RestaurantSim.Models.SessionParticipant", b =>
+                {
+                    b.HasOne("RestaurantSim.Models.GameSession", null)
+                        .WithMany()
+                        .HasForeignKey("GameSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RestaurantSim.Models.Team", b =>
                 {
                     b.HasOne("RestaurantSim.Models.GameSession", null)
                         .WithMany()
