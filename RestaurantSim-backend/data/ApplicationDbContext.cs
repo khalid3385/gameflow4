@@ -17,6 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<Ronde> Rondes => Set<Ronde>();
     public DbSet<Beslissing> Beslissingen => Set<Beslissing>();
+    public DbSet<KPI> KPIs => Set<KPI>();
     public DbSet<SessionParticipant> SessionParticipants
     => Set<SessionParticipant>();
 
@@ -114,6 +115,32 @@ builder.Entity<Beslissing>(beslissing =>
     beslissing.HasIndex(b => new { b.TeamId, b.RondeId })
         .IsUnique();
 });
+
+builder.Entity<KPI>(kpi =>
+{
+    kpi.HasKey(k => k.Id);
+
+    kpi.Property(k => k.KPI_Naam)
+        .IsRequired();
+
+    kpi.HasOne<Team>()
+        .WithMany()
+        .HasForeignKey(k => k.TeamId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    kpi.HasOne<Ronde>()
+        .WithMany()
+        .HasForeignKey(k => k.RondeId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    kpi.HasIndex(k => new
+    {
+        k.TeamId,
+        k.RondeId,
+        k.KPI_Naam
+    }).IsUnique();
+});
+
 
 
     }

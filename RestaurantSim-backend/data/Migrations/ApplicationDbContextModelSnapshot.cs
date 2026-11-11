@@ -266,6 +266,35 @@ namespace RestaurantSim.Data.Migrations
                     b.ToTable("GameSessions");
                 });
 
+            modelBuilder.Entity("RestaurantSim.Models.KPI", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("KPI_Naam")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RondeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Waarde")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RondeId");
+
+                    b.HasIndex("TeamId", "RondeId", "KPI_Naam")
+                        .IsUnique();
+
+                    b.ToTable("KPIs");
+                });
+
             modelBuilder.Entity("RestaurantSim.Models.Ronde", b =>
                 {
                     b.Property<int>("Id")
@@ -422,6 +451,21 @@ namespace RestaurantSim.Data.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
                         .WithMany()
                         .HasForeignKey("CreatorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RestaurantSim.Models.KPI", b =>
+                {
+                    b.HasOne("RestaurantSim.Models.Ronde", null)
+                        .WithMany()
+                        .HasForeignKey("RondeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RestaurantSim.Models.Team", null)
+                        .WithMany()
+                        .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
