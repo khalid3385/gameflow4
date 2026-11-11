@@ -239,6 +239,31 @@ namespace RestaurantSim.Data.Migrations
                     b.ToTable("Beslissingen");
                 });
 
+            modelBuilder.Entity("RestaurantSim.Models.Feedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Feedback_Tekst")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RondeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RondeId");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Feedbacks");
+                });
+
             modelBuilder.Entity("RestaurantSim.Models.GameSession", b =>
                 {
                     b.Property<int>("Id")
@@ -432,6 +457,21 @@ namespace RestaurantSim.Data.Migrations
                 });
 
             modelBuilder.Entity("RestaurantSim.Models.Beslissing", b =>
+                {
+                    b.HasOne("RestaurantSim.Models.Ronde", null)
+                        .WithMany()
+                        .HasForeignKey("RondeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RestaurantSim.Models.Team", null)
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RestaurantSim.Models.Feedback", b =>
                 {
                     b.HasOne("RestaurantSim.Models.Ronde", null)
                         .WithMany()

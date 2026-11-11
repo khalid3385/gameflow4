@@ -18,6 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Ronde> Rondes => Set<Ronde>();
     public DbSet<Beslissing> Beslissingen => Set<Beslissing>();
     public DbSet<KPI> KPIs => Set<KPI>();
+    public DbSet<Feedback> Feedbacks => Set<Feedback>();
     public DbSet<SessionParticipant> SessionParticipants
     => Set<SessionParticipant>();
 
@@ -115,6 +116,27 @@ builder.Entity<Beslissing>(beslissing =>
     beslissing.HasIndex(b => new { b.TeamId, b.RondeId })
         .IsUnique();
 });
+
+
+builder.Entity<Feedback>(feedback =>
+{
+    feedback.HasKey(f => f.Id);
+
+    feedback.Property(f => f.Feedback_Tekst)
+        .IsRequired();
+
+    feedback.HasOne<Team>()
+        .WithMany()
+        .HasForeignKey(f => f.TeamId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    feedback.HasOne<Ronde>()
+        .WithMany()
+        .HasForeignKey(f => f.RondeId)
+        .OnDelete(DeleteBehavior.Restrict);
+});
+
+
 
 builder.Entity<KPI>(kpi =>
 {
