@@ -15,6 +15,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<GameSession> GameSessions => Set<GameSession>();
     public DbSet<Team> Teams => Set<Team>();
+    public DbSet<Ronde> Rondes => Set<Ronde>();
     public DbSet<SessionParticipant> SessionParticipants
     => Set<SessionParticipant>();
 
@@ -50,24 +51,42 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 .OnDelete(DeleteBehavior.Cascade);  
         });
 
-        
-        builder.Entity<Team>(team =>{
-    team.HasKey(t => t.Id);
 
-    team.Property(t => t.T_naam)
-        .IsRequired();
+        builder.Entity<Team>(team =>
+        {
+            team.HasKey(t => t.Id);
 
-    team.Property(t => t.TeamCode)
-        .IsRequired();
+            team.Property(t => t.T_naam)
+                .IsRequired();
 
-    team.HasIndex(t => t.TeamCode)
-        .IsUnique();
+            team.Property(t => t.TeamCode)
+                .IsRequired();
 
-    team.HasOne<GameSession>()
-        .WithMany()
-        .HasForeignKey(t => t.GameSessionId)
-        .OnDelete(DeleteBehavior.Cascade);
-});
+            team.HasIndex(t => t.TeamCode)
+                .IsUnique();
+
+            team.HasOne<GameSession>()
+                .WithMany()
+                .HasForeignKey(t => t.GameSessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+             
+        builder.Entity<Ronde>(ronde =>
+        {
+            ronde.HasKey(r => r.Id);
+
+            ronde.Property(r => r.RondeStatus)
+                .IsRequired();
+
+            ronde.HasIndex(r => new { r.GameSessionId, r.RondeNummer })
+                .IsUnique();
+
+            ronde.HasOne<GameSession>()
+                .WithMany()
+                .HasForeignKey(r => r.GameSessionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
 
     }
 }

@@ -236,6 +236,30 @@ namespace RestaurantSim.Data.Migrations
                     b.ToTable("GameSessions");
                 });
 
+            modelBuilder.Entity("RestaurantSim.Models.Ronde", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("GameSessionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RondeNummer")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("RondeStatus")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameSessionId", "RondeNummer")
+                        .IsUnique();
+
+                    b.ToTable("Rondes");
+                });
+
             modelBuilder.Entity("RestaurantSim.Models.SessionParticipant", b =>
                 {
                     b.Property<int>("Id")
@@ -354,6 +378,15 @@ namespace RestaurantSim.Data.Migrations
                         .WithMany()
                         .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RestaurantSim.Models.Ronde", b =>
+                {
+                    b.HasOne("RestaurantSim.Models.GameSession", null)
+                        .WithMany()
+                        .HasForeignKey("GameSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
