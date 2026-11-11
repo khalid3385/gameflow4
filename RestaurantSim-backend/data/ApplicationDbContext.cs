@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<GameSession> GameSessions => Set<GameSession>();
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<Ronde> Rondes => Set<Ronde>();
+    public DbSet<Beslissing> Beslissingen => Set<Beslissing>();
     public DbSet<SessionParticipant> SessionParticipants
     => Set<SessionParticipant>();
 
@@ -87,6 +88,33 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 .HasForeignKey(r => r.GameSessionId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+
+
+builder.Entity<Beslissing>(beslissing =>
+{
+    beslissing.HasKey(b => b.Id);
+
+    beslissing.Property(b => b.Aspect)
+        .IsRequired();
+
+    beslissing.Property(b => b.Keuze)
+        .IsRequired();
+
+    beslissing.HasOne<Team>()
+        .WithMany()
+        .HasForeignKey(b => b.TeamId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    beslissing.HasOne<Ronde>()
+        .WithMany()
+        .HasForeignKey(b => b.RondeId)
+        .OnDelete(DeleteBehavior.Restrict);
+
+    beslissing.HasIndex(b => new { b.TeamId, b.RondeId })
+        .IsUnique();
+});
+
 
     }
 }
