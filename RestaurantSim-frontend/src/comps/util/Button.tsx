@@ -1,13 +1,8 @@
 const Button = ({ children, shadow = "shadow-sm", ...props }) => {
-  let final_class =
+  const final_class =
     (props?.className || " ") +
-    ` not-disabled:cursor-pointer h-10 transition-all  duration-100`;
+    ` not-disabled:cursor-pointer  transition-all  duration-100 px-4 py-1.5 rounded-xl `;
 
-  if (!final_class.includes("px") && !final_class.includes("p-"))
-    final_class += " px-4";
-  if (!final_class.includes("py") && !final_class.includes("p-"))
-    final_class += " py-1.5";
-  if (!final_class.includes("rounded")) final_class += " rounded-xl ";
 
   return (
     <button {...props} className={final_class}>
@@ -19,13 +14,18 @@ const Button = ({ children, shadow = "shadow-sm", ...props }) => {
 export const SubmitButton = ({
   disabled,
   text,
+  className,
+  onClick,
 }: {
-  disabled: boolean;
+  disabled?: boolean;
   text: string;
+  className?: string;
+  onClick?: VoidFunction
 }) => {
   return (
     <Button
-      className="bg-neutral-800 hover:bg-neutral-700 text-white h-12 mt-4"
+      onClick={onClick}
+      className={`bg-primary not-disabled:hover:bg-primary-hover text-white  ${disabled && "bg-primary/70 cursor-not-allowed"} ` + className}
       type="submit"
       disabled={disabled}
     >

@@ -7,11 +7,13 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router";
-import CreateSession from "./comps/pages/CreateSession.tsx";
+
 import Login from "./comps/pages/Login.tsx";
 import SignUp from "./comps/pages/SignUp.tsx";
 import Home from "./comps/pages/Home.tsx";
 import PageNotFound from "./comps/pages/PageNotFound.tsx";
+
+import CreateSession from "./comps/pages/createSession/CreateSession.tsx";
 
 
 const router = createBrowserRouter([
@@ -24,6 +26,7 @@ const router = createBrowserRouter([
       { path: "/join", index: true, element: <JoinSession />}, // landing page goes here
       { path: "/login", index: true, element: <Login />}, // landing page goes here
       { path: "/signup", index: true, element: <SignUp />}, // landing page goes here
+
       { path: "/create", index: true, element: <CreateSession />}, // landing page goes here
 
       { path: "*", element: <PageNotFound /> }, // not found

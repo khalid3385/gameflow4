@@ -1,9 +1,10 @@
-import FormCard, { FormHeader } from "../util/FormCard";
-import TextInput from "../util/TextInput";
+import Input from "../util/TextInput";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "../util/TextInput";
 import { SubmitButton } from "../util/Button";
 import { useNavigate } from "react-router";
+import { Card2, CardBody } from "../util/card/Card2";
+import { CardHeader } from "../util/card/CardHeader";
 
 type FormFields = {
   password: string;
@@ -30,7 +31,6 @@ const SignUp = () => {
 
   const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
     clearErrors("root.serverError");
-
 
     try {
       const response = await fetch("/auth/register", {
@@ -77,19 +77,19 @@ const SignUp = () => {
 
   return (
     <div className="flex flex-1 items-center justify-center">
-      <FormCard width="w-110">
-        <div>
-          <FormHeader
-            title="Sign up"
-            description="Enter your details to sign up."
-            marginBottom="2rem"
-          />
+      <Card2 className="w-110">
+        <CardHeader
+          title="Sign up"
+          description="Enter your details to sign up."
+          size="lg"
+        />
+        <CardBody>
           <form
             className="flex flex-col gap-3"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <TextInput
-              {...register("email", {
+            <Input
+              registration={register("email", {
                 required: "Enter an email adress",
                 pattern: {
                   value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -103,8 +103,8 @@ const SignUp = () => {
 
               // required
             />
-            <TextInput
-              {...register("password", {
+            <Input
+              registration={register("password", {
                 required: "Enter a password",
                 pattern: {
                   value: PWD_REGEX,
@@ -118,8 +118,8 @@ const SignUp = () => {
               labelContent={"Password"}
             />
 
-            <TextInput
-              {...register("confirmPassword", {
+            <Input
+              registration={register("confirmPassword", {
                 validate: (val: string) => {
                   if (errors?.password) return;
 
@@ -141,11 +141,12 @@ const SignUp = () => {
             <SubmitButton
               disabled={isSubmitting}
               text={isSubmitting ? "Signing in..." : "Sign up"}
+              className="mt-2 py-3!"
             />
           </form>
-        </div>
+        </CardBody>
         {serverError && <ErrorMessage errorContent={serverError?.message} />}
-      </FormCard>
+      </Card2>
     </div>
   );
 };

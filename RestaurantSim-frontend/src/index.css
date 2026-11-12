@@ -1,1 +1,40 @@
 @import "tailwindcss";
+
+:root {
+  /* Backgrounds — slightly deeper warm parchment & golden cream */
+  --bg-page: #eee4c5; /* Warm golden-cream page background */
+  --bg-surface: #ede0bb; /* Richer buttercream for cards, inputs & headers */
+  --bg-surface-darker: #e3d6b0; /* Deeper toasted sand for footers & recessed areas */
+  --bg-surface-hover: #f2e9ce; /* Warm cream for hover states */
+
+  /* Borders — slightly richer golden-tan lines to match the deeper surfaces */
+  --border-context: #cabd8f; /* Warm golden-champagne border */
+  --border-strong: #c2b07a; /* Deeper muted gold for focus rings & active states */
+
+  /* Typography */
+  --text-main: #292314; /* Deep warm charcoal-umber */
+  --text-muted: #706446; /* Slightly deeper brass-taupe for contrast on darker bg */
+
+  /* Accents & Buttons */
+  --accent-primary: #e04b00; /* Rich warm burnt-orange primary button */
+  --accent-hover: #e85004; /* Deeper roasted orange on hover */
+  --accent-text: #fffaf5; /* Crisp warm off-white button text */
+}
+
+@theme {
+  --font-serif: "Libertinus Serif";
+  --color-page: var(--bg-page);
+  --color-surface: var(--bg-surface);
+  --color-surface-darker: var(--bg-surface-darker);
+  --color-surface-hover: var(--bg-surface-hover);
+
+  --color-context-border: var(--border-context);
+  --color-strong-border: var(--border-strong);
+
+  --color-main-text: var(--text-main);
+  --color-muted-text: var(--text-muted);
+
+  --color-primary: var(--accent-primary);
+  --color-primary-hover: var(--accent-hover);
+  --color-primary-text: var(--accent-text);
+}

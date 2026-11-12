@@ -1,10 +1,11 @@
 import { useState } from "react";
-import FormCard, { FormHeader } from "../util/FormCard";
-import TextInput from "../util/TextInput";
-import Button from "../util/Button";
+
+import Input from "../util/TextInput";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "../util/TextInput";
 import { SubmitButton } from "../util/Button";
+import { Card2, CardBody } from "../util/card/Card2";
+import { CardHeader } from "../util/card/CardHeader";
 
 type FormFields = {
   code: string;
@@ -12,17 +13,15 @@ type FormFields = {
   request: string;
 };
 
-type JoinedParticipant = {
+type JoinedTeam = {
   id: number;
-  gameSessionId: number;
-  nickname: string;
-  joinedAtUtc: string;
+  name: string;
+  profileNumber: number;
+  members: string[];
 };
 
 export default function JoinSession() {
-  const [participant, setParticipant] = useState<JoinedParticipant | null>(
-    null,
-  );
+  const [participant, setParticipant] = useState<JoinedTeam | null>(null);
 
   const {
     register,
@@ -33,7 +32,7 @@ export default function JoinSession() {
 
   const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
     try {
-      const response = await fetch("/sessions/join", {
+      const response = await fetch("/teams/join", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "omit",
@@ -50,12 +49,12 @@ export default function JoinSession() {
 
         setError("code", {
           type: "custom",
-          message: problem?.error ?? "Could not join the session.",
+          message: problem?.error ?? "Could not find the session.",
         });
         return;
       }
 
-      const joined: JoinedParticipant = await response.json();
+      const joined: JoinedTeam = await response.json();
       setParticipant(joined);
     } catch {
       setError("request", {
@@ -67,67 +66,67 @@ export default function JoinSession() {
 
   return (
     <div className="flex flex-1 items-center justify-center">
-      <FormCard width="w-110">
+      <Card2 className="w-110">
         {!participant ? (
           <>
-            <FormHeader
+            <CardHeader
               title="Join a team"
-              description="Enter the code given by the host to join a team."
-              marginBottom="2rem"
+              size="lg"
+              description="Enter a team code to join a team."
+              // className="mb-2!"
             />
-            <form
-              className="flex flex-col gap-3"
-              onSubmit={handleSubmit(onSubmit)}
-            >
-              <TextInput
-                {...register("nickname", {
-                  required: "Nickname can not be empty",
-                })}
-                errorContent={errors?.nickname?.message}
-                placeholder="John Doe"
-                labelContent={"Nickname"}
-                name="nickname"
-                maxLength={30}
-                // required
-              />
-              <TextInput
-                {...register("code", {
-                  required: "Code can not be empty",
+            <CardBody>
+              <form
+                className="flex flex-col gap-3"
+                onSubmit={handleSubmit(onSubmit)}
+              >
+                <Input
+                  registration={register("nickname", {
+                    required: "Nickname can not be empty",
+                  })}
+                  errorContent={errors?.nickname?.message}
+                  labelContent={"Nickname"}
+                  maxLength={30}
+                  // required
+                />
+                <Input
+                  registration={register("code", {
+                    required: "Code can not be empty",
 
-                  pattern: {
-                    value: /[0-9]{6}/,
-                    message: "Enter a valid code.",
-                  },
-                })}
-                placeholder="Enter Code"
-                errorContent={errors?.code?.message}
-                labelContent={"Session code"}
-                name="code"
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                // required
-              />
-              <SubmitButton 
-                disabled={isSubmitting}
-                text={isSubmitting ? "Joining…" : "Join"}
-              />
-            </form>
-            {errors?.request && (
-              <ErrorMessage errorContent={errors?.request?.message} />
-            )}
+                    pattern: {
+                      value: /[0-9]{6}/,
+                      message: "Enter a valid code.",
+                    },
+                  })}
+                  errorContent={errors?.code?.message}
+                  labelContent={"Team code"}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={6}
+                  // required
+                />
+                <SubmitButton
+                  className="mt-2! py-3"
+                  disabled={isSubmitting}
+                  text={isSubmitting ? "Joining…" : "Join"}
+                />
+              </form>
+              {errors?.request && (
+                <ErrorMessage errorContent={errors?.request?.message} />
+              )}
+            </CardBody>
           </>
         ) : (
           <div className="text-center">
             <p className="text-6xl text-green-500 mb-4">✓</p>
             <h2 className="text-4xl mb-2 font-medium">
-              You joined Session {participant.gameSessionId}
+              You joined team: {participant.name}
             </h2>
             <p className="opacity-70">Awaiting the host to start the game.</p>
             {/* <h3 className="mt-5 text-2xl">Get ready {participant.nickname}!</h3> */}
           </div>
         )}
-      </FormCard>
+      </Card2>
     </div>
   );
 }
