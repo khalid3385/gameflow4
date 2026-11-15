@@ -1,9 +1,8 @@
-import Card from "../util/Card";
 import Input from "../util/TextInput";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { ErrorMessage } from "../util/TextInput";
 import { SubmitButton } from "../util/Button";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { Card2, CardBody } from "../util/card/Card2";
 import { CardHeader } from "../util/card/CardHeader";
 
@@ -53,6 +52,7 @@ const Login = () => {
   };
 
   const nav = useNavigate();
+  const { state } = useLocation();
   const serverError = errors?.root?.serverError;
 
   return (
@@ -64,6 +64,12 @@ const Login = () => {
           description="Enter your details to login."
         />
         <CardBody>
+          {state?.accountCreated === true && (
+            <p className="mb-3 text-sm" role="status">
+              Account created. Log in to continue.
+            </p>
+          )}
+
           <form
             className="flex flex-col gap-3"
             onSubmit={handleSubmit(onSubmit)}
@@ -80,7 +86,6 @@ const Login = () => {
                 errors?.email?.message || (serverError?.message ? " " : "")
               }
               labelContent={"Email"}
-              maxLength={30}
             />
             <Input
               type="password"
@@ -100,7 +105,9 @@ const Login = () => {
           </form>
         </CardBody>
 
-        <ErrorMessage errorContent={serverError?.message} />
+        {serverError?.message && (
+          <ErrorMessage errorContent={serverError.message} />
+        )}
       </Card2>
     </div>
   );

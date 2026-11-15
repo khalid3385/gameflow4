@@ -48,22 +48,27 @@ const SignUp = () => {
           .json()
           .catch(() => null);
 
-        const errors = Object.values(problem?.errors ?? {})
-          .flat()
-          .join(" ");
-
-        // extend later!!!
-        if (problem?.errors.DuplicateUserName) {
+        if (problem?.errors?.DuplicateUserName?.length) {
           setError("email", {
             type: "custom",
-            message: "Email is already taken",
+            message: "Email is already taken.",
+          });
+        } else {
+          const message = Object.values(problem?.errors ?? {})
+            .flat()
+            .join(" ");
+
+          setError("root.serverError", {
+            type: "custom",
+            message:
+              message || "Could not create the account. Please try again.",
           });
         }
         return;
       }
 
       // navigate to create page
-      nav("/create");
+      nav("/login", { state: { accountCreated: true } });
     } catch {
       setError("root.serverError", {
         type: "custom",
@@ -104,6 +109,7 @@ const SignUp = () => {
               // required
             />
             <Input
+              type="password"
               registration={register("password", {
                 required: "Enter a password",
                 pattern: {
@@ -119,6 +125,7 @@ const SignUp = () => {
             />
 
             <Input
+              type="password"
               registration={register("confirmPassword", {
                 validate: (val: string) => {
                   if (errors?.password) return;
@@ -140,12 +147,14 @@ const SignUp = () => {
             />
             <SubmitButton
               disabled={isSubmitting}
-              text={isSubmitting ? "Signing in..." : "Sign up"}
+              text={isSubmitting ? "Creating account..." : "Sign up"}
               className="mt-2 py-3!"
             />
           </form>
         </CardBody>
-        {serverError && <ErrorMessage errorContent={serverError?.message} />}
+        {serverError?.message ? (
+          <ErrorMessage errorContent={serverError.message} />
+        ) : null}
       </Card2>
     </div>
   );
