@@ -52,7 +52,10 @@ const Login = () => {
   };
 
   const nav = useNavigate();
-  const { state } = useLocation();
+  const { state, search } = useLocation();
+  const accountCreated = state?.accountCreated === true;
+  const redirectedFromCreate =
+    new URLSearchParams(search).get("reason") === "create";
   const serverError = errors?.root?.serverError;
 
   return (
@@ -64,9 +67,11 @@ const Login = () => {
           description="Enter your details to login."
         />
         <CardBody>
-          {state?.accountCreated === true && (
+          {(accountCreated || redirectedFromCreate) && (
             <p className="mb-3 text-sm" role="status">
-              Account created. Log in to continue.
+              {accountCreated
+                ? "Account created. Log in to continue."
+                : "Please log in to create a session."}
             </p>
           )}
 
