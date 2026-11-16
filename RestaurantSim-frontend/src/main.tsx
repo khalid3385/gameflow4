@@ -14,7 +14,7 @@ import Login from "./comps/pages/Login.tsx";
 import SignUp from "./comps/pages/SignUp.tsx";
 import Home from "./comps/pages/Home.tsx";
 import PageNotFound from "./comps/pages/PageNotFound.tsx";
-
+import TeamRolesPage from "./comps/pages/TeamRolesPage";
 import CreateSession from "./comps/pages/createSession/CreateSession.tsx";
 
 async function requireLogin({ request }: LoaderFunctionArgs) {
@@ -45,7 +45,14 @@ const router = createBrowserRouter([
       { path: "/join", index: true, element: <JoinSession /> }, // landing page goes here
       { path: "/login", index: true, element: <Login /> }, // landing page goes here
       { path: "/signup", index: true, element: <SignUp /> }, // landing page goes here
-
+      {
+        path: "preview/roles",
+        element: (
+          <div className="m-10 w-full">
+            <TeamRolesPage teamName="Preview Team" memberCount={6} />
+          </div>
+        ),
+      },
       {
         path: "/create",
         loader: requireLogin,

@@ -38,3 +38,118 @@
   --color-primary-hover: var(--accent-hover);
   --color-primary-text: var(--accent-text);
 }
+
+/*even als temp*/
+.team-roles {
+  --roles-surface: var(--bg-surface, var(--bg, #fff));
+  --roles-inset: var(--bg-surface-darker, var(--code-bg, #f4f1e8));
+  --roles-border: var(--border-context, var(--border, #cabd8f));
+  --roles-muted: var(--text-muted, var(--text, #706446));
+  --roles-accent: var(--accent-primary, var(--accent, #e04b00));
+
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  min-width: 0;
+  color: var(--text-main, var(--text-h, #292314));
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.team-roles__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.team-roles h2,
+.team-roles h3,
+.team-roles p {
+  margin: 0;
+}
+
+.team-roles h2,
+.team-roles h3 {
+  color: inherit;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.team-roles p {
+  color: var(--roles-muted);
+}
+
+.team-roles__team,
+.team-roles__tabs button,
+.team-roles__panel {
+  border: 1px solid var(--roles-border);
+  border-radius: 0.75rem;
+  background: var(--roles-surface);
+}
+
+.team-roles__team {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.team-roles__tabs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 6.5rem), 1fr));
+  gap: 0.5rem;
+}
+
+.team-roles__tabs button {
+  min-height: 2.75rem;
+  padding: 0.5rem;
+  color: inherit;
+  font: inherit;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.team-roles__tabs button:hover,
+.team-roles__tabs button[aria-selected='true'] {
+  background: var(--roles-inset);
+}
+
+.team-roles__tabs button[aria-selected='true'] {
+  border-color: var(--roles-accent);
+  font-weight: 600;
+}
+
+.team-roles__tabs button:focus-visible,
+.team-roles__panel:focus-visible {
+  outline: 2px solid var(--roles-accent);
+  outline-offset: 2px;
+}
+
+.team-roles__panel:not([hidden]) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.team-roles .team-roles__description {
+  margin-top: 0.5rem;
+  white-space: pre-line;
+}
+
+.team-roles__image {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: var(--roles-inset);
+}
+
+.team-roles__image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
