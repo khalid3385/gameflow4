@@ -19,6 +19,9 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Beslissing> Beslissingen => Set<Beslissing>();
     public DbSet<KPI> KPIs => Set<KPI>();
     public DbSet<Feedback> Feedbacks => Set<Feedback>();
+    public DbSet<Rol> Rollen => Set<Rol>();
+    public DbSet<Doel> Doelen => Set<Doel>();
+    public DbSet<Event> Events => Set<Event>();
     public DbSet<SessionParticipant> SessionParticipants
     => Set<SessionParticipant>();
 
@@ -51,7 +54,18 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             participant.HasOne<GameSession>()
                 .WithMany()
                 .HasForeignKey(p => p.GameSessionId)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Cascade); 
+
+participant.HasOne<Team>()
+    .WithMany()
+    .HasForeignKey(p => p.TeamId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+participant.HasOne<Rol>()
+    .WithMany()
+    .HasForeignKey(p => p.RolId)
+    .OnDelete(DeleteBehavior.Restrict);
+ 
         });
 
 
@@ -89,6 +103,13 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 .WithMany()
                 .HasForeignKey(r => r.GameSessionId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+ronde.HasOne<Event>()
+    .WithMany()
+    .HasForeignKey(r => r.EventId)
+    .OnDelete(DeleteBehavior.Restrict);
+
+
         });
 
 
@@ -135,6 +156,54 @@ builder.Entity<Feedback>(feedback =>
         .HasForeignKey(f => f.RondeId)
         .OnDelete(DeleteBehavior.Restrict);
 });
+
+
+builder.Entity<Rol>(rol =>
+{
+    rol.HasKey(r => r.Id);
+
+    rol.Property(r => r.R_naam)
+        .IsRequired();
+
+    rol.HasIndex(r => r.R_naam)
+        .IsUnique();
+});
+
+builder.Entity<Doel>(doel =>
+{
+    doel.HasKey(d => d.Id);
+
+    doel.Property(d => d.Omschrijving)
+        .IsRequired();
+
+    doel.Property(d => d.Doel_Soort)
+        .IsRequired();
+
+    doel.HasOne<Team>()
+        .WithMany()
+        .HasForeignKey(d => d.TeamId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
+builder.Entity<Event>(gameEvent =>
+{
+    gameEvent.HasKey(e => e.Id);
+
+    gameEvent.Property(e => e.E_naam)
+        .IsRequired();
+
+    gameEvent.Property(e => e.Beschrijving)
+        .IsRequired();
+
+    gameEvent.Property(e => e.Effect)
+        .IsRequired();
+
+    gameEvent.HasOne<GameSession>()
+        .WithMany()
+        .HasForeignKey(e => e.GameSessionId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
 
 
 

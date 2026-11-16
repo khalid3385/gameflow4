@@ -239,6 +239,67 @@ namespace RestaurantSim.Data.Migrations
                     b.ToTable("Beslissingen");
                 });
 
+            modelBuilder.Entity("RestaurantSim.Models.Doel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Doel_Gekozen")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Doel_Punten")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Doel_Soort")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("Doel_Streefwaarde")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Omschrijving")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Doelen");
+                });
+
+            modelBuilder.Entity("RestaurantSim.Models.Event", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Beschrijving")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("E_naam")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Effect")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GameSessionId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GameSessionId");
+
+                    b.ToTable("Events");
+                });
+
             modelBuilder.Entity("RestaurantSim.Models.Feedback", b =>
                 {
                     b.Property<int>("Id")
@@ -320,10 +381,31 @@ namespace RestaurantSim.Data.Migrations
                     b.ToTable("KPIs");
                 });
 
+            modelBuilder.Entity("RestaurantSim.Models.Rol", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("R_naam")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("R_naam")
+                        .IsUnique();
+
+                    b.ToTable("Rollen");
+                });
+
             modelBuilder.Entity("RestaurantSim.Models.Ronde", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("EventId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("GameSessionId")
@@ -337,6 +419,8 @@ namespace RestaurantSim.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("GameSessionId", "RondeNummer")
                         .IsUnique();
@@ -360,9 +444,19 @@ namespace RestaurantSim.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("RolId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("TeamId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GameSessionId");
+
+                    b.HasIndex("RolId");
+
+                    b.HasIndex("TeamId");
 
                     b.ToTable("SessionParticipants");
                 });
@@ -471,6 +565,24 @@ namespace RestaurantSim.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RestaurantSim.Models.Doel", b =>
+                {
+                    b.HasOne("RestaurantSim.Models.Team", null)
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("RestaurantSim.Models.Event", b =>
+                {
+                    b.HasOne("RestaurantSim.Models.GameSession", null)
+                        .WithMany()
+                        .HasForeignKey("GameSessionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RestaurantSim.Models.Feedback", b =>
                 {
                     b.HasOne("RestaurantSim.Models.Ronde", null)
@@ -512,6 +624,11 @@ namespace RestaurantSim.Data.Migrations
 
             modelBuilder.Entity("RestaurantSim.Models.Ronde", b =>
                 {
+                    b.HasOne("RestaurantSim.Models.Event", null)
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("RestaurantSim.Models.GameSession", null)
                         .WithMany()
                         .HasForeignKey("GameSessionId")
@@ -526,6 +643,17 @@ namespace RestaurantSim.Data.Migrations
                         .HasForeignKey("GameSessionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("RestaurantSim.Models.Rol", null)
+                        .WithMany()
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("RestaurantSim.Models.Team", null)
+                        .WithMany()
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("RestaurantSim.Models.Team", b =>

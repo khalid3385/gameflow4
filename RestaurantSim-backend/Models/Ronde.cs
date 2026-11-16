@@ -6,5 +6,6 @@ public class Ronde
     public int GameSessionId {get; set;}
     public int RondeNummer {get; set;}
     public string RondeStatus {get; set;} = string.Empty;
+    public int? EventId { get; set; }
 
 }
