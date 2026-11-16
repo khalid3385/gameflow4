@@ -5,7 +5,7 @@ import { useState } from "react";
 
 import { SubmitButton } from "../../util/Button";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import Input from "../../util/TextInput";
+import Input, { ErrorMessage } from "../../util/TextInput";
 
 export type TeamInput = {
   name: string;
@@ -26,33 +26,15 @@ type CreatedSession = {
   teams: CreatedTeam[];
 };
 
-const MOCK_TEAMS: CreatedTeam[] = [
-  {
-    name: "Bistro Brigade",
-    profileNumber: 1,
-    index: 0,
-    joinCode: "BIST-73",
-    memberNames: ["jacob", "fortnite", "john"],
-  },
-  { name: "Bistro Brigade", profileNumber: 1, index: 0, joinCode: "BIST-73" },
-  { name: "Bistro Brigade", profileNumber: 1, index: 0, joinCode: "BIST-73" },
-  { name: "Bistro Brigade", profileNumber: 1, index: 0, joinCode: "BIST-73" },
-  { name: "Bistro Brigade", profileNumber: 1, index: 0, joinCode: "BIST-73" },
-];
-
-const MOCK_SESSION: CreatedSession = {
-  id: 1,
-  createdAtUtc: "1",
-  teams: MOCK_TEAMS,
-};
-
 const CreateSession = () => {
-  const [teams, setTeams] = useState<CreatedTeam[]>(MOCK_TEAMS);
-
-  const [session, setSession] = useState<CreatedSession | null>();
+  const [teams, setTeams] = useState<CreatedTeam[]>([]);
+  const [session, setSession] = useState<CreatedSession | null>(null);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   async function createSession() {
-    setSession(null);
+    setCreateError(null);
+    setIsCreating(true);
 
     try {
       const response = await fetch("/sessions", {
@@ -62,22 +44,27 @@ const CreateSession = () => {
         body: JSON.stringify({ teams }),
       });
 
+      if (response.status === 401) {
+        setCreateError("Please log in to create a session.");
+        return;
+      }
+
       if (!response.ok) {
         const problem: { error?: string } | null = await response
           .json()
           .catch(() => null);
 
-          console.log("problem")
-        // setMessage(problem?.error ?? "Could not create the session.");
+        setCreateError(problem?.error ?? "Could not create the session.");
         return;
       }
 
       const created: CreatedSession = await response.json();
       setSession(created);
       setTeams([]);
-      //   setMessage("Session created successfully.");
     } catch {
-      //   setMessage("Could not reach the server.");
+      setCreateError("Could not create the session. Please try again.");
+    } finally {
+      setIsCreating(false);
     }
   }
 
@@ -110,7 +97,9 @@ const CreateSession = () => {
                 size="md"
                 align="left"
               />
-              <CreateTeamForm handleAddTeam={addTeam} />
+              <fieldset disabled={isCreating} className="min-w-0 w-full">
+                <CreateTeamForm handleAddTeam={addTeam} />
+              </fieldset>
             </>
           )}
 
@@ -136,7 +125,7 @@ const CreateSession = () => {
                         key={`${t.name}-${i}`}
                         {...t}
                         index={i + 1}
-                        joinCode={session ? t.joinCode : null}
+                        joinCode={session ? t.joinCode : undefined}
                       />
                     ))}
                   </div>
@@ -152,15 +141,21 @@ const CreateSession = () => {
           </div>
         </section>
 
-        <section className="flex ">
+        <section className="flex flex-col items-start gap-2">
           <SubmitButton
             onClick={() => !session && createSession()}
             className="mt-2! py-3"
-            disabled={!session && teams.length <= 0}
+            disabled={!session && (isCreating || teams.length <= 0)}
             text={
               session ? "Start Simulation" : "Create Session & Generate Codes"
             }
           />
+
+          {createError && (
+            <div role="alert">
+              <ErrorMessage errorContent={createError} />
+            </div>
+          )}
         </section>
       </Card2>
     </div>
@@ -212,11 +207,14 @@ const CreatedTeam = ({
   );
 };
 
-const CreateTeamForm = ({ handleAddTeam }) => {
+const CreateTeamForm = ({
+  handleAddTeam,
+}: {
+  handleAddTeam: (teamName: string, profileNumber: number) => void;
+}) => {
   const {
     register,
     handleSubmit,
-    setError,
     clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<TeamInput>();
@@ -233,7 +231,7 @@ const CreateTeamForm = ({ handleAddTeam }) => {
         registration={register("name", {
           required: "Team Name can not be empty",
         })}
-        errorContent={errors?.name?.message}
+        errorContent={errors?.name?.message ?? ""}
         labelContent={"Team Name"}
         containerClassName="flex-1 h-full mt-0!"
 
@@ -243,9 +241,10 @@ const CreateTeamForm = ({ handleAddTeam }) => {
       <Input
         type="number"
         registration={register("profileNumber", {
+          valueAsNumber: true,
           required: "Profile number can not be empty",
         })}
-        errorContent={errors?.profileNumber?.message}
+        errorContent={errors?.profileNumber?.message ?? ""}
         labelContent={"Profile Number"}
         containerClassName="mt-0!"
 
