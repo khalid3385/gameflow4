@@ -13,6 +13,10 @@ export default defineConfig({
         target: 'http://localhost:5176',
         changeOrigin: true,
       },
+      '/teams': {
+        target: 'http://localhost:5176',
+        changeOrigin: true,
+      },
     },
   },
 })

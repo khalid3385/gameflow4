@@ -1,56 +1,38 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace RestaurantSim.Data.Migrations
 {
-    /// <inheritdoc />
     public partial class AddTeam : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Teams",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    T_naam = table.Column<string>(type: "TEXT", nullable: false),
-                    TeamCode = table.Column<string>(type: "TEXT", nullable: false),
-                    Profiel = table.Column<string>(type: "TEXT", nullable: false),
-                    Strategie = table.Column<string>(type: "TEXT", nullable: false),
-                    Punten = table.Column<int>(type: "INTEGER", nullable: false),
-                    GameSessionId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Teams", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Teams_GameSessions_GameSessionId",
-                        column: x => x.GameSessionId,
-                        principalTable: "GameSessions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Teams_GameSessionId",
+            migrationBuilder.AddColumn<string>(
+                name: "Strategie",
                 table: "Teams",
-                column: "GameSessionId");
+                type: "TEXT",
+                nullable: false,
+                defaultValue: "");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Teams_TeamCode",
+            migrationBuilder.AddColumn<int>(
+                name: "Punten",
                 table: "Teams",
-                column: "TeamCode",
-                unique: true);
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: 0);
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Teams");
+            migrationBuilder.DropColumn(
+                name: "Strategie",
+                table: "Teams");
+
+            migrationBuilder.DropColumn(
+                name: "Punten",
+                table: "Teams");
         }
     }
 }

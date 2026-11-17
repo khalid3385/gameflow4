@@ -14,7 +14,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     }
 
     public DbSet<GameSession> GameSessions => Set<GameSession>();
-    public DbSet<Team> Teams => Set<Team>();
     public DbSet<Ronde> Rondes => Set<Ronde>();
     public DbSet<Beslissing> Beslissingen => Set<Beslissing>();
     public DbSet<KPI> KPIs => Set<KPI>();
@@ -24,6 +23,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Event> Events => Set<Event>();
     public DbSet<SessionParticipant> SessionParticipants
     => Set<SessionParticipant>();
+    public DbSet<Team> Teams => Set<Team>();
+    public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -69,24 +70,50 @@ participant.HasOne<Rol>()
         });
 
 
-        builder.Entity<Team>(team =>
-        {
-            team.HasKey(t => t.Id);
+        
+builder.Entity<Team>(team =>
+{
+    team.HasKey(t => t.Id);
 
-            team.Property(t => t.T_naam)
-                .IsRequired();
+    team.Property(t => t.Name)
+        .IsRequired()
+        .HasMaxLength(50);
 
-            team.Property(t => t.TeamCode)
-                .IsRequired();
+    team.Property(t => t.JoinCode)
+        .IsRequired()
+        .HasMaxLength(6);
 
-            team.HasIndex(t => t.TeamCode)
-                .IsUnique();
+    team.HasIndex(t => t.JoinCode)
+        .IsUnique();
 
-            team.HasOne<GameSession>()
-                .WithMany()
-                .HasForeignKey(t => t.GameSessionId)
-                .OnDelete(DeleteBehavior.Cascade);
-        });
+    team.Property(t => t.Strategie)
+        .IsRequired();
+
+    team.HasOne(t => t.GameSession)
+        .WithMany(s => s.Teams)
+        .HasForeignKey(t => t.GameSessionId)
+        .OnDelete(DeleteBehavior.Cascade);
+
+    team.ToTable(table =>
+    {
+        table.HasCheckConstraint(
+            "CK_Teams_ProfileNumber",
+            "\"ProfileNumber\" >= 1 AND \"ProfileNumber\" <= 6");
+    });
+});
+
+builder.Entity<TeamMember>(member =>
+{
+    member.Property(m => m.Name)
+        .IsRequired()
+        .HasMaxLength(50);
+
+    member.HasOne(m => m.Team)
+        .WithMany(t => t.Members)
+        .HasForeignKey(m => m.TeamId)
+        .OnDelete(DeleteBehavior.Cascade);
+});
+
 
              
         builder.Entity<Ronde>(ronde =>
@@ -231,6 +258,7 @@ builder.Entity<KPI>(kpi =>
         k.KPI_Naam
     }).IsUnique();
 });
+
 
 
 
