@@ -9,4 +9,7 @@ public class SessionParticipant
     public string Nickname { get; set; } = string.Empty;
 
     public DateTime JoinedAtUtc { get; set; }
+
+    public int? TeamId { get; set; }
+    public int RolId { get; set; }
 }
