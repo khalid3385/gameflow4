@@ -1,18 +1,17 @@
-import { CardHeader } from "../../util/card/CardHeader";
-import { Card2 } from "../../util/card/Card2";
-
-import { useState } from "react";
-
 import { SubmitButton } from "../../util/Button";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import Input, { ErrorMessage } from "../../util/TextInput";
-import type { TeamInput } from "./CreateSession";
+import Input from "../../util/TextInput";
+
+export type TeamInput = {
+  name: string;
+  profileNumber: number;
+};
 
 const CreateTeamForm = ({ handleAddTeam }) => {
   const {
     register,
     handleSubmit,
-    setError,
+    // setError,
     clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<TeamInput>();

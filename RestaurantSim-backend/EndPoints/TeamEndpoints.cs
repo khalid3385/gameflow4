@@ -49,6 +49,7 @@ public static class TeamEndpoints
             var response = new JoinedTeamResponse(
                 team.Id,
                 team.Name,
+                joinCode,
                 team.ProfileNumber,
                 team.Members
                     .Select(member => new TeamMemberResponse(

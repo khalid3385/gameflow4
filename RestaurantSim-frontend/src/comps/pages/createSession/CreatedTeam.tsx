@@ -1,7 +1,7 @@
-import React from 'react';
+
 import type { CreatedTeam } from './CreateSession';
 
-const CreatedTeam = ({
+const CreatedTeamRow = ({
   index,
   name,
   profileNumber,
@@ -9,7 +9,7 @@ const CreatedTeam = ({
   memberNames = [],
 }: CreatedTeam) => {
   return (
-    <div className="border border-context-border p-3 rounded-xl ">
+    <div className="border border-context-border bg-white p-3 rounded-xl ">
       <div className="flex justify-between w-full ">
         <div className="flex items-center gap-3">
           <p className="p-1 px-2.25 rounded-full bg-surface-darker font-medium text-xs">
@@ -47,4 +47,4 @@ const CreatedTeam = ({
 };
 
 
-export default CreatedTeam;
+export default CreatedTeamRow;

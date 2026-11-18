@@ -1,5 +1,6 @@
-import type { TeamInput } from "../../pages/CreateSession2";
+
 import { BellDot, Folder } from "lucide-react";
+import type { TeamInput } from "../../pages/createSession/CreateTeamForm";
 
 const TeamTable = ({ teams, session }) => {
   return (

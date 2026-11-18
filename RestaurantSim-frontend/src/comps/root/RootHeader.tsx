@@ -5,6 +5,8 @@ import { useAuth } from "../../auth/AuthContext";
 const RootHeader = () => {
   const { isLoggedIn, loading, logout } = useAuth();
 
+  
+
   return (
     <header className="h-15 fixed w-full bg-page border-b border-context-border">
       <div className="flex items-center justify-between gap-10 h-full px-5">

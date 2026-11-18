@@ -22,7 +22,7 @@ const Input = ({
   const [value, setValue] = useState<string>();
   const final_class =
     (className || " ") +
-    ` h-13 border border-1 border-context-border  peer autofill:shadow-[inset_0_0_0px_1000px_var(--bg-page))]  px-3
+    ` h-13 border border-1 border-context-border  peer autofill:shadow-[inset_0_0_0px_1000px_#ffff] bg-white!  px-3
     ${errorContent && "border-red-400! "} rounded-xl py-2 `;
 
 
@@ -51,11 +51,11 @@ const Input = ({
       {labelContent && (
         <label
           className={`pointer-events-none mb-1 
-          absolute rounded px-1 bg-page
-          ${value ? "left-2 -top-2.25 text-[smaller] " : "top-3.25 left-3 peer-not-focus:opacity-60 "}
+          absolute rounded px-1 bg-white 
+          ${value ? "left-1.5 -top-2.75 text-[smaller] border-1 border-context-border " : "top-3.25 left-3 peer-not-focus:opacity-60 "}
           
-          peer-focus:-top-2.25 peer-focus:left-2  peer-focus:text-[smaller] 
-          ${errorContent ? `peer-focus:text-red-400 ${value && "text-red-400"}` : " peer-focus:text-blue-700"} 
+          peer-focus:-top-2.75 peer-focus:left-1.5 peer-focus:border  peer-focus:text-[smaller] 
+          ${errorContent ? `peer-focus:text-red-400 ${value && "text-red-400 border-red-400"} ` : " peer-focus:text-blue-700 peer-focus:border-blue-700 "} 
           transition-[top,left,font-size] duration-150`}
         >
           {labelContent}

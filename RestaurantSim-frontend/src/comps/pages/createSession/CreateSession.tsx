@@ -6,11 +6,7 @@ import { useState } from "react";
 import { SubmitButton } from "../../util/Button";
 import { ErrorMessage } from "../../util/TextInput";
 import CreateTeamForm from "./CreateTeamForm";
-import CreatedTeam from "./CreatedTeam";
-export type TeamInput = {
-  name: string;
-  profileNumber: number;
-};
+import CreatedTeamRow from "./CreatedTeam";
 
 export type CreatedTeam = {
   index?: number;
@@ -121,7 +117,7 @@ const CreateSession = () => {
                 <>
                   <div className="flex-1 max-h-75 h-75   overflow-y-auto flex flex-col gap-4 pr-1">
                     {(session?.teams || teams).map((t, i) => (
-                      <CreatedTeam
+                      <CreatedTeamRow
                         key={`${t.name}-${i}`}
                         {...t}
                         index={i + 1}
@@ -161,7 +157,5 @@ const CreateSession = () => {
     </div>
   );
 };
-
-
 
 export default CreateSession;

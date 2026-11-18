@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import RootLayout from "./comps/root/RootLayout.tsx";
-import JoinSession from "./comps/pages/JoinSession.tsx";
+import JoinSession from "./comps/pages/joinSession/JoinSession.tsx";
 import {
   createBrowserRouter,
   redirect,
