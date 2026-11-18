@@ -1,4 +1,4 @@
-import React from "react";
+import { lookupTeam } from "../../../api/teams";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import type { JoinedTeam } from "./JoinSession";
 import { CardHeader } from "../../util/card/CardHeader";
@@ -8,26 +8,19 @@ import { SubmitButton } from "../../util/Button";
 
 type FormFields = {
   code: string;
-  request: string;
 };
 
-const JoinTeamForm = ({ setTeam }) => {
+const JoinTeamForm = ({ setTeam }: { setTeam: (team: JoinedTeam) => void }) => {
   const {
     register,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<FormFields>();
-  const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
+
+  const onSubmit: SubmitHandler<FormFields> = async ({ code }) => {
     try {
-      const response = await fetch("/teams/join", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "omit",
-        body: JSON.stringify({
-          joinCode: String(data.code ?? "").trim(),
-        }),
-      });
+      const response = await lookupTeam(code);
 
       if (!response.ok) {
         const problem: { error?: string } | null = await response
@@ -35,22 +28,23 @@ const JoinTeamForm = ({ setTeam }) => {
           .catch(() => null);
 
         setError("code", {
-          type: "custom",
-          message: problem?.error ?? "Could not find the session.",
+          type: "server",
+          message: problem?.error ?? "Could not join the team.",
         });
         return;
       }
 
-
       const joined: JoinedTeam = await response.json();
       setTeam(joined);
     } catch {
-      setError("request", {
-        type: "custom",
+      setError("root.request", {
+        type: "server",
         message: "Could not reach the server, try again later.",
       });
     }
   };
+
+  const requestError = errors.root?.request?.message;
 
   return (
     <>
@@ -58,25 +52,22 @@ const JoinTeamForm = ({ setTeam }) => {
         title="Join a team"
         size="lg"
         description="Enter a team code to join a team."
-        // className="mb-2!"
       />
       <CardBody>
         <form className="flex flex-col gap-3" onSubmit={handleSubmit(onSubmit)}>
           <Input
             registration={register("code", {
-              required: "Code can not be empty",
-
+              required: "Enter a team code.",
               pattern: {
-                value: /[0-9]{6}/,
-                message: "Enter a valid code.",
+                value: /^[0-9]{6}$/,
+                message: "Enter a six-digit team code.",
               },
             })}
-            errorContent={errors?.code?.message}
-            labelContent={"Team code"}
+            errorContent={errors.code?.message ?? ""}
+            labelContent="Team code"
             type="text"
             inputMode="numeric"
             maxLength={6}
-            // required
           />
           <SubmitButton
             className="mt-2! py-3"
@@ -84,9 +75,7 @@ const JoinTeamForm = ({ setTeam }) => {
             text={isSubmitting ? "Joining…" : "Join"}
           />
         </form>
-        {errors?.request && (
-          <ErrorMessage errorContent={errors?.request?.message} />
-        )}
+        {requestError && <ErrorMessage errorContent={requestError} />}
       </CardBody>
     </>
   );

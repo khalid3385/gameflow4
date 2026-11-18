@@ -6,8 +6,8 @@ import { useLocation, useNavigate } from "react-router";
 import { Card2, CardBody } from "../util/card/Card2";
 import { CardHeader } from "../util/card/CardHeader";
 
-
-import {useAuth} from "../../auth/AuthContext";
+// @ts-ignore AuthContext is a JavaScript module without a declaration file.
+import { useAuth } from "../../auth/AuthContext";
 type FormFields = {
   password: string;
   email: string;
@@ -22,37 +22,28 @@ const Login = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormFields>();
 
-  const {login } = useAuth()
-  const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
+  const { login } = useAuth();
+  const nav = useNavigate();
+
+  const onSubmit: SubmitHandler<FormFields> = async ({ email, password }) => {
     clearErrors("root.serverError");
 
     try {
-      const response = await login ({
-          email: String(data.email ?? "").trim(),
-          password: String(data.password ?? ""),
-        })
+      await login({ email: email.trim(), password });
+      nav("/create", { replace: true });
+    } catch (error) {
+      let message = "Could not reach the server, try again later.";
 
-      if (!response.ok) {
-        setError("root.serverError", {
-          type: "custom",
-          message: "Email and password don't match.",
-        });
-        return;
+      if (error instanceof Error && "status" in error) {
+        message =
+          error.status === 401
+            ? "Email and password don't match."
+            : "Could not log in. Please try again.";
       }
 
-      nav("/create");
-    } catch {
-      setError("root.serverError", {
-        type: "custom",
-        message: "Could not reach the server, try again later.",
-      });
+      setError("root.serverError", { type: "server", message });
     }
   };
-
-  const nav = useNavigate();
-
-  
-
 
   const { state, search } = useLocation();
   const accountCreated = state?.accountCreated === true;

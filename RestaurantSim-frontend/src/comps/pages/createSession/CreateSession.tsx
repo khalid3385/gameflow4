@@ -1,7 +1,9 @@
 import { CardHeader } from "../../util/card/CardHeader";
 import { Card2 } from "../../util/card/Card2";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { HubConnectionBuilder } from "@microsoft/signalr";
+import { readTabValue, writeTabValue } from "../../util/tabStorage";
 
 import { SubmitButton } from "../../util/Button";
 import { ErrorMessage } from "../../util/TextInput";
@@ -22,11 +24,89 @@ type CreatedSession = {
   teams: CreatedTeam[];
 };
 
+const SESSION_ID_KEY = "restauflow.hostSessionId";
+
+function readSessionId() {
+  const id = Number(readTabValue(SESSION_ID_KEY));
+  return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
 const CreateSession = () => {
   const [teams, setTeams] = useState<CreatedTeam[]>([]);
   const [session, setSession] = useState<CreatedSession | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+
+  const [sessionId, setSessionId] = useState(readSessionId);
+  const [liveError, setLiveError] = useState("");
+
+  useEffect(() => {
+    if (sessionId === null) return;
+
+    const connection = new HubConnectionBuilder()
+      .withUrl("/hubs/session-members")
+      .withAutomaticReconnect()
+      .build();
+
+    let active = true;
+    let readVersion = 0;
+
+    async function refreshSession() {
+      const version = ++readVersion;
+
+      try {
+        const fresh = await connection.invoke<CreatedSession | null>(
+          "GetSession",
+          sessionId,
+        );
+        if (!active || version !== readVersion) return;
+
+        if (!fresh) {
+          writeTabValue(SESSION_ID_KEY, null);
+          setSessionId(null);
+          setSession(null);
+          setLiveError("This session is no longer available.");
+          return;
+        }
+
+        setSession(fresh);
+        setLiveError("");
+      } catch {
+        if (active && version === readVersion) {
+          setLiveError("Could not load team members. Refresh to retry.");
+        }
+      }
+    }
+
+    connection.on("SessionMembersChanged", (changedId: number) => {
+      if (changedId === sessionId) void refreshSession();
+    });
+
+    connection.onreconnecting(() => {
+      readVersion++;
+      if (active) setLiveError("Reconnecting live member updates...");
+    });
+
+    connection.onreconnected(() => void refreshSession());
+
+    connection.onclose(() => {
+      readVersion++;
+      if (active) setLiveError("Live updates disconnected. Refresh to retry.");
+    });
+
+    void connection
+      .start()
+      .then(refreshSession)
+      .catch(() => {
+        if (active)
+          setLiveError("Could not connect to live updates. Refresh to retry.");
+      });
+
+    return () => {
+      active = false;
+      void connection.stop().catch(() => {});
+    };
+  }, [sessionId]);
 
   async function createSession() {
     setCreateError(null);
@@ -56,6 +136,9 @@ const CreateSession = () => {
 
       const created: CreatedSession = await response.json();
       setSession(created);
+      setSessionId(created.id);
+      writeTabValue(SESSION_ID_KEY, String(created.id));
+      setLiveError("");
       setTeams([]);
     } catch {
       setCreateError("Could not create the session. Please try again.");
@@ -71,6 +154,14 @@ const CreateSession = () => {
       ...currentTeams,
       { name: cleanedName, profileNumber: _profileNumber },
     ]);
+  }
+
+  if (sessionId !== null && !session) {
+    return liveError ? (
+      <p role="alert">{liveError}</p>
+    ) : (
+      <p role="status">Restoring your session...</p>
+    );
   }
 
   return (
@@ -146,6 +237,8 @@ const CreateSession = () => {
               session ? "Start Simulation" : "Create Session & Generate Codes"
             }
           />
+
+          {liveError && <p role="status">{liveError}</p>}
 
           {createError && (
             <div role="alert">

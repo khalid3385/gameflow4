@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RestaurantSim.Data;
 using RestaurantSim.Endpoints;
 using RestaurantSim.Services;
+using RestaurantSim.Hubs;
 
 using Microsoft.OpenApi;
 
@@ -41,6 +42,8 @@ builder.Services
 
 builder.Services.AddScoped<GameSessionService>();
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
@@ -57,4 +60,10 @@ app.UseAuthorization();
 app.MapAuthEndpoints();
 app.MapSessionEndpoints();
 app.MapTeamEndpoints();
+
+app.MapHub<SessionMembersHub>("/hubs/session-members", options =>
+{
+    options.CloseOnAuthenticationExpiration = true;
+}).RequireAuthorization();
+
 app.Run();

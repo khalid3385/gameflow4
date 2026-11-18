@@ -3,25 +3,32 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import Input from "../../util/TextInput";
 export type Member = {
   name: string;
-
 };
 
-const AddMemberForm = ({ handleAddMember }) => {
+type AddMemberProps = {
+  handleAddMember: (name: string) => void | Promise<void>;
+};
+
+const AddMemberForm = ({ handleAddMember }: AddMemberProps) => {
   const {
     register,
     handleSubmit,
-    // setError,
-    setValue,
     reset,
-    clearErrors,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<Member>();
 
-  const onSubmit: SubmitHandler<Member> = async (data: Member) => {
-    clearErrors("root.serverError");
-
-    handleAddMember(data.name);
-    reset()
+  const onSubmit: SubmitHandler<Member> = async ({ name }) => {
+    try {
+      await handleAddMember(name.trim());
+      reset();
+    } catch (error) {
+      setError("name", {
+        type: "server",
+        message:
+          error instanceof Error ? error.message : "Could not add the member.",
+      });
+    }
   };
 
   return (

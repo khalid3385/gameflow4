@@ -115,7 +115,7 @@ const SignUp = () => {
                 pattern: {
                   value: PWD_REGEX,
                   message:
-                    "Password should be 8-24 characters and include at least 1 letter, 1 number and 1 special character",
+                    "Use 8–24 characters with at least one uppercase letter, one lowercase letter, one number, and one of !@#$%.",
                 },
               })}
               errorContent={
