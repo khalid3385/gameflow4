@@ -59,6 +59,39 @@ public static class SessionEndpoints
         })
         .RequireAuthorization();
 
+        endpoints.MapGet("/sessions/{sessionId:int}/teams", async (
+            int sessionId,
+            GameSessionService service,
+            CancellationToken cancellationToken) =>
+        {
+            var teams = await service.GetSessionTeamsAsync(
+                sessionId,
+                cancellationToken);
+         
+            if (teams is null)
+            {
+                return Results.NotFound(new
+                {
+                    error = "The session was not found."
+                });
+            }
+         
+            var response = teams
+                .Select(team => new SessionTeamResponse(
+                    team.Id,
+                    team.Name,
+                    team.ProfileNumber,
+                    team.Members
+                        .Select(member => new TeamMemberResponse(
+                            member.Id,
+                            member.Name))
+                        .ToList()))
+                .ToList();
+         
+            return Results.Ok(response);
+        })
+        .AllowAnonymous();
+
         return endpoints;
     }
 }

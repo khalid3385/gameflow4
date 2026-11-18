@@ -197,6 +197,29 @@ public async Task<bool> DeleteTeamMemberAsync(
     return true;
 }
 
+public async Task<List<Team>?> GetSessionTeamsAsync(
+    int sessionId,
+    CancellationToken cancellationToken = default)
+{
+    var sessionExists = await _db.GameSessions
+        .AsNoTracking()
+        .AnyAsync(
+            session => session.Id == sessionId,
+            cancellationToken);
+ 
+    if (!sessionExists)
+    {
+        return null;
+    }
+ 
+    return await _db.Teams
+        .AsNoTracking()
+        .Include(team => team.Members)
+        .Where(team => team.GameSessionId == sessionId)
+        .OrderBy(team => team.Id)
+        .ToListAsync(cancellationToken);
+}
+
      
     private sealed record PreparedTeam(
         string Name,
