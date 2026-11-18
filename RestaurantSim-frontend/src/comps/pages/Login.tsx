@@ -6,6 +6,8 @@ import { useLocation, useNavigate } from "react-router";
 import { Card2, CardBody } from "../util/card/Card2";
 import { CardHeader } from "../util/card/CardHeader";
 
+
+import {useAuth} from "../../auth/AuthContext";
 type FormFields = {
   password: string;
   email: string;
@@ -20,19 +22,15 @@ const Login = () => {
     formState: { errors, isSubmitting },
   } = useForm<FormFields>();
 
+  const {login } = useAuth()
   const onSubmit: SubmitHandler<FormFields> = async (data: FormFields) => {
     clearErrors("root.serverError");
 
     try {
-      const response = await fetch("/auth/login?useCookies=true", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
+      const response = await login ({
           email: String(data.email ?? "").trim(),
           password: String(data.password ?? ""),
-        }),
-      });
+        })
 
       if (!response.ok) {
         setError("root.serverError", {
@@ -52,6 +50,10 @@ const Login = () => {
   };
 
   const nav = useNavigate();
+
+  
+
+
   const { state, search } = useLocation();
   const accountCreated = state?.accountCreated === true;
   const redirectedFromCreate =

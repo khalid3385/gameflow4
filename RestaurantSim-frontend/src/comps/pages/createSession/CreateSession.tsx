@@ -4,15 +4,15 @@ import { Card2 } from "../../util/card/Card2";
 import { useState } from "react";
 
 import { SubmitButton } from "../../util/Button";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import Input, { ErrorMessage } from "../../util/TextInput";
-
+import { ErrorMessage } from "../../util/TextInput";
+import CreateTeamForm from "./CreateTeamForm";
+import CreatedTeam from "./CreatedTeam";
 export type TeamInput = {
   name: string;
   profileNumber: number;
 };
 
-type CreatedTeam = {
+export type CreatedTeam = {
   index?: number;
   name: string;
   joinCode?: string;
@@ -162,102 +162,6 @@ const CreateSession = () => {
   );
 };
 
-const CreatedTeam = ({
-  index,
-  name,
-  profileNumber,
-  joinCode,
-  memberNames = [],
-}: CreatedTeam) => {
-  return (
-    <div className="border border-context-border p-3 rounded-xl ">
-      <div className="flex justify-between w-full ">
-        <div className="flex items-center gap-3">
-          <p className="p-1 px-2.25 rounded-full bg-surface-darker font-medium text-xs">
-            {index}
-          </p>
 
-          <p className="font-medium">{name}</p>
-          <p className="p-1 px-1.5 bg-surface-darker rounded-lg font-medium text-xs">
-            Profile #{profileNumber}
-          </p>
-        </div>
-        {joinCode && (
-          <div>
-            <p className="text-primary font-semibold bg-surface-darker p-1 px-3 rounded-lg">
-              <span className="opacity-50 mr-1"># </span> {joinCode}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {joinCode && (
-        <div className="border-t border-inherit pt-3 mt-2 text-xs">
-          <span className="font-medium">Joined Members: </span>
-          <span className="flex-inline gap-1">
-            {memberNames.map((m) => (
-              <span className="mr-1 p-0.5 px-2 border rounded-full border-context-border">
-                {m}
-              </span>
-            ))}
-          </span>
-        </div>
-      )}
-    </div>
-  );
-};
-
-const CreateTeamForm = ({
-  handleAddTeam,
-}: {
-  handleAddTeam: (teamName: string, profileNumber: number) => void;
-}) => {
-  const {
-    register,
-    handleSubmit,
-    clearErrors,
-    formState: { errors, isSubmitting },
-  } = useForm<TeamInput>();
-
-  const onSubmit: SubmitHandler<TeamInput> = async (data: TeamInput) => {
-    clearErrors("root.serverError");
-
-    handleAddTeam(data.name, data.profileNumber);
-  };
-
-  return (
-    <form className="flex gap-4  w-full " onSubmit={handleSubmit(onSubmit)}>
-      <Input
-        registration={register("name", {
-          required: "Team Name can not be empty",
-        })}
-        errorContent={errors?.name?.message ?? ""}
-        labelContent={"Team Name"}
-        containerClassName="flex-1 h-full mt-0!"
-
-        // maxLength={30}
-      />
-
-      <Input
-        type="number"
-        registration={register("profileNumber", {
-          valueAsNumber: true,
-          required: "Profile number can not be empty",
-        })}
-        errorContent={errors?.profileNumber?.message ?? ""}
-        labelContent={"Profile Number"}
-        containerClassName="mt-0!"
-
-        // maxLength={30}
-      />
-
-      <SubmitButton
-        disabled={isSubmitting}
-        className="h-13"
-        text={isSubmitting ? "Creating..." : "+ Add Team"}
-      />
-    </form>
-  );
-};
 
 export default CreateSession;

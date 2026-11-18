@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,14 +13,31 @@ public static class AuthEndpoints
 
         auth.MapIdentityApi<IdentityUser>();
 
+        auth.MapGet("/me", async (
+            ClaimsPrincipal claimsPrincipal,
+            UserManager<IdentityUser> userManager) =>
+        {
+            var user = await userManager.GetUserAsync(claimsPrincipal);
+            if (user is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            return Results.Ok(new
+            {
+                user.Id,
+                user.UserName,
+                user.Email
+            });
+        });
+        // .RequireAuthorization();
+
         auth.MapPost("/logout", async (
-            [FromBody] object body,
             SignInManager<IdentityUser> signInManager) =>
         {
             await signInManager.SignOutAsync();
             return Results.NoContent();
-        })
-        .RequireAuthorization();
+        });
 
         return endpoints;
     }

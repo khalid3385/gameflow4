@@ -10,12 +10,14 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 
+import { AuthProvider } from "./auth/AuthContext";
 import Login from "./comps/pages/Login.tsx";
 import SignUp from "./comps/pages/SignUp.tsx";
 import Home from "./comps/pages/Home.tsx";
 import PageNotFound from "./comps/pages/PageNotFound.tsx";
 import TeamRolesPage from "./comps/pages/TeamRolesPage";
 import CreateSession from "./comps/pages/createSession/CreateSession.tsx";
+import { AppRoute } from "./comps/root/AppRoute.tsx";
 
 async function requireLogin({ request }: LoaderFunctionArgs) {
   const response = await fetch("/auth/manage/info", {
@@ -39,12 +41,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
-    // element: <RootLayout />,
     children: [
-      { path: "/", index: true, element: <Home /> }, // landing page goes here
-      { path: "/join", index: true, element: <JoinSession /> }, // landing page goes here
-      { path: "/login", index: true, element: <Login /> }, // landing page goes here
-      { path: "/signup", index: true, element: <SignUp /> }, // landing page goes here
+      // Openbare pagina's (voor iedereen zichtbaar)
+      { index: true, element: <Home /> },
+      { path: "join", element: <JoinSession /> },
       {
         path: "preview/roles",
         element: (
@@ -53,31 +53,48 @@ const router = createBrowserRouter([
           </div>
         ),
       },
-      {
-        path: "/create",
-        loader: requireLogin,
-        element: <CreateSession />,
-        hydrateFallbackElement: (
-          <p className="m-10" role="status">
-            {" "}
-            Checking your login...
-          </p>
-        ),
-        errorElement: (
-          <p className="m-10" role="alert">
-            Could not verify your login. Refresh the page to try again.
-          </p>
-        ),
-      }, // landing page goes here
 
-      { path: "*", element: <PageNotFound /> }, // not found
+      // Alleen voor uitgelogde gebruikers (stuurt al ingelogde gebruikers weg naar "/")
+      {
+        element: <AppRoute protectedRoute={false} />,
+        children: [
+          { path: "login", element: <Login /> },
+          { path: "signup", element: <SignUp /> },
+        ],
+      },
+
+      // Alleen voor ingelogde gebruikers (stuurt gasten door naar "/login")
+      {
+        element: <AppRoute protectedRoute={true} />,
+        children: [
+          {
+            path: "create",
+            element: <CreateSession />,
+            hydrateFallbackElement: (
+              <p className="m-10" role="status">
+                Checking your login...
+              </p>
+            ),
+            errorElement: (
+              <p className="m-10" role="alert">
+                Could not verify your login. Refresh the page to try again.
+              </p>
+            ),
+          },
+        ],
+      },
+
+      { path: "*", element: <PageNotFound /> },
     ],
   },
 ]);
 
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     {/* <App /> */}
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );

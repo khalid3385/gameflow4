@@ -1,6 +1,6 @@
-import { Link, Outlet } from "react-router";
-
 import RootHeader from "./RootHeader"
+import { AppRoute } from "./AppRoute";
+import { Outlet } from "react-router";
 
 const RootLayout = () => {
   return (
