@@ -153,3 +153,57 @@
   height: 100%;
   object-fit: contain;
 }
+
+.session-layout {
+  position: relative;
+  min-height: 100vh;
+}
+ 
+.session-layout__teams {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 50;
+}
+ 
+.session-layout__teams-popover {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 20rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 1rem;
+  border: 1px solid #9ca3af;
+  border-radius: 0.5rem;
+  background: white;
+  color: black;
+  box-shadow: 0 0.75rem 2rem rgb(0 0 0 / 20%);
+}
+ 
+.teams-popover h2 {
+  margin-top: 0;
+}
+ 
+.teams-popover__teams {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+ 
+.teams-popover__team {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #d1d5db;
+}
+ 
+.teams-popover__team:last-child {
+  border-bottom: 0;
+}
+ 
+.teams-popover__team p {
+  margin: 0.25rem 0;
+}
+ 
+.teams-popover__members {
+  padding-left: 1.25rem;
+}

@@ -10,7 +10,7 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 
-import { AuthProvider } from "./auth/AuthContext";
+import { AuthProvider } from "./auth/AuthContext.jsx";
 import Login from "./comps/pages/Login.tsx";
 import SignUp from "./comps/pages/SignUp.tsx";
 import Home from "./comps/pages/Home.tsx";
@@ -18,6 +18,7 @@ import PageNotFound from "./comps/pages/PageNotFound.tsx";
 import TeamRolesPage from "./comps/pages/TeamRolesPage";
 import CreateSession from "./comps/pages/createSession/CreateSession.tsx";
 import { AppRoute } from "./comps/root/AppRoute.tsx";
+import SessionLayout from "./comps/root/SessionLayout.tsx";
 
 async function requireLogin({ request }: LoaderFunctionArgs) {
   const response = await fetch("/auth/manage/info", {
@@ -79,6 +80,24 @@ const router = createBrowserRouter([
               <p className="m-10" role="alert">
                 Could not verify your login. Refresh the page to try again.
               </p>
+            ),
+          },
+        ],
+      },
+
+      {
+        path: "session/:sessionId",
+        element: <SessionLayout />,
+        children: [
+          {
+            path: "roles",
+            element: (
+              <div className="m-10 w-full">
+                <TeamRolesPage
+                  teamName="Team"
+                  memberCount={null}
+                />
+              </div>
             ),
           },
         ],

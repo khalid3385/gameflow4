@@ -226,6 +226,82 @@ public class GameSessionService
     }
 
 
+<<<<<<< HEAD
+=======
+    if (string.IsNullOrWhiteSpace(cleanedName))
+    {
+        throw new ArgumentException(
+            "A name is required.");
+    }
+
+    if (cleanedName.Length > 50)
+    {
+        throw new ArgumentException(
+            "A name must be at most 50 characters.");
+    }
+
+    var member = new TeamMember
+    {
+        TeamId = team.Id,
+        Name = cleanedName
+    };
+
+    _db.TeamMembers.Add(member);
+
+    await _db.SaveChangesAsync(cancellationToken);
+
+    return member;
+}
+
+public async Task<bool> DeleteTeamMemberAsync(
+    int memberId,
+    string joinCode,
+    CancellationToken cancellationToken = default)
+{
+    var member = await _db.TeamMembers
+        .SingleOrDefaultAsync(
+            teamMember =>
+                teamMember.Id == memberId
+                && teamMember.Team.JoinCode == joinCode,
+            cancellationToken);
+ 
+    if (member is null)
+    {
+        return false;
+    }
+ 
+    _db.TeamMembers.Remove(member);
+ 
+    await _db.SaveChangesAsync(cancellationToken);
+ 
+    return true;
+}
+
+public async Task<List<Team>?> GetSessionTeamsAsync(
+    int sessionId,
+    CancellationToken cancellationToken = default)
+{
+    var sessionExists = await _db.GameSessions
+        .AsNoTracking()
+        .AnyAsync(
+            session => session.Id == sessionId,
+            cancellationToken);
+ 
+    if (!sessionExists)
+    {
+        return null;
+    }
+ 
+    return await _db.Teams
+        .AsNoTracking()
+        .Include(team => team.Members)
+        .Where(team => team.GameSessionId == sessionId)
+        .OrderBy(team => team.Id)
+        .ToListAsync(cancellationToken);
+}
+
+     
+>>>>>>> origin/Owen
     private sealed record PreparedTeam(
         string Name,
         int ProfileNumber);
