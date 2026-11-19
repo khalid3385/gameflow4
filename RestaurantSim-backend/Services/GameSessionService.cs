@@ -1,4 +1,4 @@
-using Microsoft.Data.Sqlite;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using RestaurantSim.Data;
 using RestaurantSim.Models;
@@ -125,8 +125,8 @@ public class GameSessionService
                 return session;
             }
             catch (DbUpdateException exception) when (
-                exception.InnerException is SqliteException sqliteException
-                && sqliteException.SqliteExtendedErrorCode == 2067)
+    exception.InnerException is PostgresException
+    { SqlState: PostgresErrorCodes.UniqueViolation })
             {
                 _db.ChangeTracker.Clear();
             }

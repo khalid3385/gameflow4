@@ -32,7 +32,7 @@ var connectionString =
         "Connection string 'DefaultConnection' was not found.");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(connectionString));
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddAuthorization();
 
