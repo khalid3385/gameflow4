@@ -3,12 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import RootLayout from "./comps/root/RootLayout.tsx";
 import JoinSession from "./comps/pages/joinSession/JoinSession.tsx";
-import {
-  createBrowserRouter,
-  redirect,
-  RouterProvider,
-  type LoaderFunctionArgs,
-} from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router";
 
 import { AuthProvider } from "./auth/AuthContext.jsx";
 import Login from "./comps/pages/Login.tsx";
@@ -19,24 +14,7 @@ import TeamRolesPage from "./comps/pages/TeamRolesPage";
 import CreateSession from "./comps/pages/createSession/CreateSession.tsx";
 import { AppRoute } from "./comps/root/AppRoute.tsx";
 import SessionLayout from "./comps/root/SessionLayout.tsx";
-
-async function requireLogin({ request }: LoaderFunctionArgs) {
-  const response = await fetch("/auth/manage/info", {
-    credentials: "include",
-    cache: "no-store",
-    signal: request.signal,
-  });
-
-  if (response.status === 401) return redirect("/login?reason=create");
-
-  const contentType = response.headers.get("content-type");
-
-  if (!response.ok || !contentType?.includes("application/json")) {
-    throw new Error("Could not verify your login.");
-  }
-
-  return null;
-}
+import RestaurantProfielen from "./Components/RestaurantProfielen/RestaurantProfielen.tsx";
 
 const router = createBrowserRouter([
   {
@@ -54,6 +32,7 @@ const router = createBrowserRouter([
           </div>
         ),
       },
+      { path: "preview/profielen", element: <RestaurantProfielen /> },
 
       // Alleen voor uitgelogde gebruikers (stuurt al ingelogde gebruikers weg naar "/")
       {

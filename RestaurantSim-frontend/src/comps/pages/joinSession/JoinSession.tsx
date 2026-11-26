@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Card2 } from "../../util/card/Card2";
 import { CardHeader } from "../../util/card/CardHeader";
+import { Navigate } from "react-router";
 import JoinTeamForm from "./JoinTeamForm";
 import AddMemberForm from "./AddMemberForm";
 import Button from "../../util/Button";
@@ -117,20 +118,8 @@ export default function JoinSession() {
 
   if (restoring) return <p role="status">Restoring your team...</p>;
 
-  if (team?.gameStarted) {
-    return (
-      <div className="flex flex-1 flex-col m-10 ">
-        <Card2 className="flex flex-col gap-5 flex-1">
-          <CardHeader
-            title="The game has started!"
-            size="lg"
-            align="left"
-            className="mb-2"
-            description={`Team ${team.name} (profile #${team.profileNumber}). Next step: come up with your goals.`}
-          />
-        </Card2>
-      </div>
-    );
+   if (team?.gameStarted) {
+    return <Navigate to="/preview/profielen" replace />;
   }
 
   return !team ? (
