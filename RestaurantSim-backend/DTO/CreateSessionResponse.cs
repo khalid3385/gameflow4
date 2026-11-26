@@ -3,6 +3,7 @@ namespace RestaurantSim.DTO;
 public record CreateSessionResponse(
     int Id,
     DateTime CreatedAtUtc,
+    DateTime? StartedAtUtc,
     List<CreatedTeamResponse> Teams);
  
 public record CreatedTeamResponse(

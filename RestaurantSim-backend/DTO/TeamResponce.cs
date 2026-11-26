@@ -5,7 +5,8 @@ public record JoinedTeamResponse(
     string Name,
     string joinCode,
     int ProfileNumber,
-    List<TeamMemberResponse> Members);
+    List<TeamMemberResponse> Members,
+    bool GameStarted);
     
  public record SessionTeamResponse(
      int Id,

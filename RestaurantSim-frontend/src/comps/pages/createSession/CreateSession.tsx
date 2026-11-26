@@ -21,6 +21,7 @@ export type CreatedTeam = {
 type CreatedSession = {
   id: number;
   createdAtUtc: string;
+  startedAtUtc: string | null;
   teams: CreatedTeam[];
 };
 
@@ -31,11 +32,14 @@ function readSessionId() {
   return Number.isSafeInteger(id) && id > 0 ? id : null;
 }
 
+const MAX_TEAMS = 8;
+
 const CreateSession = () => {
   const [teams, setTeams] = useState<CreatedTeam[]>([]);
   const [session, setSession] = useState<CreatedSession | null>(null);
   const [createError, setCreateError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isStarting, setIsStarting] = useState(false);
 
   const [sessionId, setSessionId] = useState(readSessionId);
   const [liveError, setLiveError] = useState("");
@@ -147,6 +151,41 @@ const CreateSession = () => {
     }
   }
 
+  async function startSession() {
+    if (!session) return;
+
+    setCreateError(null);
+    setIsStarting(true);
+
+    try {
+      const response = await fetch(`/sessions/${session.id}/start`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (response.status === 401) {
+        setCreateError("Please log in to start the session.");
+        return;
+      }
+
+      if (!response.ok) {
+        const problem: { error?: string } | null = await response
+          .json()
+          .catch(() => null);
+
+        setCreateError(problem?.error ?? "Could not start the session.");
+        return;
+      }
+
+      const result: { startedAtUtc: string } = await response.json();
+      setSession({ ...session, startedAtUtc: result.startedAtUtc });
+    } catch {
+      setCreateError("Could not start the session. Please try again.");
+    } finally {
+      setIsStarting(false);
+    }
+  }
+
   function addTeam(_teamName: string, _profileNumber: number) {
     const cleanedName = _teamName.trim();
 
@@ -156,6 +195,12 @@ const CreateSession = () => {
     ]);
   }
 
+  function removeTeam(indexToRemove: number) {
+    setTeams((currentTeams) =>
+      currentTeams.filter((_, i) => i !== indexToRemove),
+    );
+  }
+
   if (sessionId !== null && !session) {
     return liveError ? (
       <p role="alert">{liveError}</p>
@@ -163,6 +208,8 @@ const CreateSession = () => {
       <p role="status">Restoring your session...</p>
     );
   }
+
+  const hasStarted = Boolean(session?.startedAtUtc);
 
   return (
     <div className="flex flex-col   m-10">
@@ -184,8 +231,14 @@ const CreateSession = () => {
                 size="md"
                 align="left"
               />
-              <fieldset disabled={isCreating} className="min-w-0 w-full">
-                <CreateTeamForm handleAddTeam={addTeam} />
+              <fieldset
+                disabled={isCreating || teams.length >= MAX_TEAMS}
+                className="min-w-0 w-full"
+              >
+                <CreateTeamForm
+                  handleAddTeam={addTeam}
+                  usedProfiles={teams.map((t) => t.profileNumber)}
+                />
               </fieldset>
             </>
           )}
@@ -213,6 +266,7 @@ const CreateSession = () => {
                         {...t}
                         index={i + 1}
                         joinCode={session ? t.joinCode : undefined}
+                        onRemove={session ? undefined : () => removeTeam(i)}
                       />
                     ))}
                   </div>
@@ -230,11 +284,21 @@ const CreateSession = () => {
 
         <section className="flex flex-col items-start gap-2">
           <SubmitButton
-            onClick={() => !session && createSession()}
+            onClick={() => (session ? startSession() : createSession())}
             className="mt-2! py-3"
-            disabled={!session && (isCreating || teams.length <= 0)}
+            disabled={
+              session
+                ? hasStarted || isStarting
+                : isCreating || teams.length <= 0
+            }
             text={
-              session ? "Start Simulation" : "Create Session & Generate Codes"
+              session
+                ? hasStarted
+                  ? "Simulation Started"
+                  : isStarting
+                    ? "Starting..."
+                    : "Start Simulation"
+                : "Create Session & Generate Codes"
             }
           />
 

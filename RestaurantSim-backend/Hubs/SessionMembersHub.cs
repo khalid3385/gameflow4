@@ -32,6 +32,7 @@ public sealed class SessionMembersHub(ApplicationDbContext db) : Hub
         return new CreateSessionResponse(
             session.Id,
             session.CreatedAtUtc,
+            session.StartedAtUtc,
             session.Teams.OrderBy(team => team.Id).Select(team =>
                 new CreatedTeamResponse(
                     team.Id,

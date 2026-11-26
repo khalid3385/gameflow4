@@ -1,4 +1,3 @@
-
 import type { CreatedTeam } from './CreateSession';
 
 const CreatedTeamRow = ({
@@ -7,7 +6,8 @@ const CreatedTeamRow = ({
   profileNumber,
   joinCode,
   memberNames = [],
-}: CreatedTeam) => {
+  onRemove,
+}: CreatedTeam & { onRemove?: () => void }) => {
   return (
     <div className="border border-context-border bg-white p-3 rounded-xl ">
       <div className="flex justify-between w-full ">
@@ -27,6 +27,15 @@ const CreatedTeamRow = ({
               <span className="opacity-50 mr-1"># </span> {joinCode}
             </p>
           </div>
+        )}
+        {!joinCode && onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            className="text-xs text-red-500 hover:underline"
+          >
+            Remove
+          </button>
         )}
       </div>
 

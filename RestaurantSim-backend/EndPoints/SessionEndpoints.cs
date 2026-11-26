@@ -34,6 +34,7 @@ public static class SessionEndpoints
                 var response = new CreateSessionResponse(
                     session.Id,
                     session.CreatedAtUtc,
+                    session.StartedAtUtc,
                     session.Teams
                         .Select(team => new CreatedTeamResponse(
                             team.Id,
@@ -91,6 +92,50 @@ public static class SessionEndpoints
             return Results.Ok(response);
         })
         .AllowAnonymous();
+
+        endpoints.MapPost("/sessions/{sessionId:int}/start", async (
+            int sessionId,
+            ClaimsPrincipal user,
+            GameSessionService service,
+            CancellationToken cancellationToken) =>
+        {
+            var creatorId =
+                user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (creatorId is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            try
+            {
+                var session = await service.StartSessionAsync(
+                    sessionId,
+                    creatorId,
+                    cancellationToken);
+
+                if (session is null)
+                {
+                    return Results.NotFound(new
+                    {
+                        error = "The session was not found."
+                    });
+                }
+
+                return Results.Ok(new
+                {
+                    startedAtUtc = session.StartedAtUtc
+                });
+            }
+            catch (ArgumentException exception)
+            {
+                return Results.BadRequest(new
+                {
+                    error = exception.Message
+                });
+            }
+        })
+        .RequireAuthorization();
 
         return endpoints;
     }

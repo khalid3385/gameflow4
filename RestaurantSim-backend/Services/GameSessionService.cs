@@ -10,6 +10,9 @@ namespace RestaurantSim.Services;
 
 public class GameSessionService
 {
+    private const int MaxGoals = 6;
+    private const int GoalsToChoose = 3;
+
     private readonly ApplicationDbContext _db;
     private readonly IHubContext<SessionMembersHub> _hub;
     private readonly ILogger<GameSessionService> _logger;
@@ -50,6 +53,12 @@ public class GameSessionService
                 "At least one team is required.");
         }
 
+        if (request.Teams.Count > 8)
+        {
+            throw new ArgumentException(
+                "A session can have at most 8 teams.");
+        }
+
         var preparedTeams = new List<PreparedTeam>();
 
         foreach (var requestedTeam in request.Teams)
@@ -69,16 +78,24 @@ public class GameSessionService
             }
 
             if (requestedTeam.ProfileNumber < 1
-                || requestedTeam.ProfileNumber > 6)
+                || requestedTeam.ProfileNumber > 8)
             {
                 throw new ArgumentException(
-                    "A profile number must be between 1 and 6.");
+                    "A profile number must be between 1 and 8.");
             }
-
 
             preparedTeams.Add(new PreparedTeam(
                 teamName,
                 requestedTeam.ProfileNumber));
+        }
+
+        if (preparedTeams
+                .Select(team => team.ProfileNumber)
+                .Distinct()
+                .Count() != preparedTeams.Count)
+        {
+            throw new ArgumentException(
+                "Every team must have a different profile number.");
         }
 
         const int maxAttempts = 5;
@@ -125,8 +142,8 @@ public class GameSessionService
                 return session;
             }
             catch (DbUpdateException exception) when (
-    exception.InnerException is PostgresException
-    { SqlState: PostgresErrorCodes.UniqueViolation })
+                exception.InnerException is PostgresException
+                { SqlState: PostgresErrorCodes.UniqueViolation })
             {
                 _db.ChangeTracker.Clear();
             }
@@ -143,6 +160,7 @@ public class GameSessionService
         return await _db.Teams
             .AsNoTracking()
             .Include(team => team.Members)
+            .Include(team => team.GameSession)
             .SingleOrDefaultAsync(
                 team => team.JoinCode == joinCode,
                 cancellationToken);
@@ -225,34 +243,182 @@ public class GameSessionService
         return true;
     }
 
-
-public async Task<List<Team>?> GetSessionTeamsAsync(
-    int sessionId,
-    CancellationToken cancellationToken = default)
-{
-    var sessionExists = await _db.GameSessions
-        .AsNoTracking()
-        .AnyAsync(
-            session => session.Id == sessionId,
-            cancellationToken);
- 
-    if (!sessionExists)
+    public async Task<List<Team>?> GetSessionTeamsAsync(
+        int sessionId,
+        CancellationToken cancellationToken = default)
     {
-        return null;
-    }
- 
-    return await _db.Teams
-        .AsNoTracking()
-        .Include(team => team.Members)
-        .Where(team => team.GameSessionId == sessionId)
-        .OrderBy(team => team.Id)
-        .ToListAsync(cancellationToken);
-}
+        var sessionExists = await _db.GameSessions
+            .AsNoTracking()
+            .AnyAsync(
+                session => session.Id == sessionId,
+                cancellationToken);
 
-     
+        if (!sessionExists)
+        {
+            return null;
+        }
+
+        return await _db.Teams
+            .AsNoTracking()
+            .Include(team => team.Members)
+            .Where(team => team.GameSessionId == sessionId)
+            .OrderBy(team => team.Id)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<GameSession?> StartSessionAsync(
+        int sessionId,
+        string creatorId,
+        CancellationToken cancellationToken = default)
+    {
+        var session = await _db.GameSessions
+            .SingleOrDefaultAsync(
+                session => session.Id == sessionId
+                    && session.CreatorId == creatorId,
+                cancellationToken);
+
+        if (session is null)
+        {
+            return null;
+        }
+
+        if (session.StartedAtUtc is not null)
+        {
+            throw new ArgumentException(
+                "The session has already been started.");
+        }
+
+        session.StartedAtUtc = DateTime.UtcNow;
+
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return session;
+    }
+
+    public async Task<List<Goal>?> GetGoalsAsync(
+        string joinCode,
+        CancellationToken cancellationToken = default)
+    {
+        var team = await _db.Teams
+            .AsNoTracking()
+            .Include(team => team.Goals)
+            .SingleOrDefaultAsync(
+                team => team.JoinCode == joinCode,
+                cancellationToken);
+
+        return team?.Goals.OrderBy(goal => goal.Id).ToList();
+    }
+
+    public async Task<Goal?> AddGoalAsync(
+        string joinCode,
+        string description,
+        CancellationToken cancellationToken = default)
+    {
+        var team = await _db.Teams
+            .Include(team => team.Goals)
+            .SingleOrDefaultAsync(
+                team => team.JoinCode == joinCode,
+                cancellationToken);
+
+        if (team is null)
+        {
+            return null;
+        }
+
+        if (team.Goals.Any(goal => goal.IsChosen))
+        {
+            throw new ArgumentException(
+                "The goals have already been chosen.");
+        }
+
+        if (team.Goals.Count >= MaxGoals)
+        {
+            throw new ArgumentException(
+                "A team can have at most 6 goals.");
+        }
+
+        var cleanedDescription = description.Trim();
+
+        if (string.IsNullOrWhiteSpace(cleanedDescription))
+        {
+            throw new ArgumentException(
+                "A goal description is required.");
+        }
+
+        if (cleanedDescription.Length > 200)
+        {
+            throw new ArgumentException(
+                "A goal description must be at most 200 characters.");
+        }
+
+        var goal = new Goal
+        {
+            TeamId = team.Id,
+            Description = cleanedDescription
+        };
+
+        _db.Goals.Add(goal);
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return goal;
+    }
+
+    public async Task<List<Goal>?> ChooseGoalsAsync(
+        string joinCode,
+        List<int> goalIds,
+        CancellationToken cancellationToken = default)
+    {
+        var team = await _db.Teams
+            .Include(team => team.Goals)
+            .SingleOrDefaultAsync(
+                team => team.JoinCode == joinCode,
+                cancellationToken);
+
+        if (team is null)
+        {
+            return null;
+        }
+
+        if (team.Goals.Any(goal => goal.IsChosen))
+        {
+            throw new ArgumentException(
+                "The goals have already been chosen.");
+        }
+
+        if (team.Goals.Count != MaxGoals)
+        {
+            throw new ArgumentException(
+                "A team must have 6 goals before choosing 3.");
+        }
+
+        var distinctIds = goalIds.Distinct().ToList();
+
+        if (distinctIds.Count != GoalsToChoose)
+        {
+            throw new ArgumentException(
+                "Choose exactly 3 different goals.");
+        }
+
+        if (distinctIds.Any(id => team.Goals.All(goal => goal.Id != id)))
+        {
+            throw new ArgumentException(
+                "Every chosen goal must belong to this team.");
+        }
+
+        foreach (var goal in team.Goals)
+        {
+            goal.IsChosen = distinctIds.Contains(goal.Id);
+        }
+
+        await _db.SaveChangesAsync(cancellationToken);
+
+        return team.Goals
+            .Where(goal => goal.IsChosen)
+            .OrderBy(goal => goal.Id)
+            .ToList();
+    }
+
     private sealed record PreparedTeam(
         string Name,
         int ProfileNumber);
-
-
 }

@@ -10,5 +10,7 @@ public class GameSession
 
     public DateTime CreatedAtUtc { get; set; }
 
+    public DateTime? StartedAtUtc { get; set; }
+
     public List<Team> Teams { get; set; } = [];
 }

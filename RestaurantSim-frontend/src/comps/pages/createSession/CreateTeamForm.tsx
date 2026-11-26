@@ -7,7 +7,13 @@ export type TeamInput = {
   profileNumber: number;
 };
 
-const CreateTeamForm = ({ handleAddTeam }) => {
+const CreateTeamForm = ({
+  handleAddTeam,
+  usedProfiles = [],
+}: {
+  handleAddTeam: (name: string, profileNumber: number) => void;
+  usedProfiles?: number[];
+}) => {
   const {
     register,
     handleSubmit,
@@ -37,14 +43,20 @@ const CreateTeamForm = ({ handleAddTeam }) => {
 
       <Input
         type="number"
+        min={1}
+        max={8}
         registration={register("profileNumber", {
           required: "Profile number can not be empty",
+          valueAsNumber: true,
+          min: { value: 1, message: "Profile number must be between 1 and 8" },
+          max: { value: 8, message: "Profile number must be between 1 and 8" },
+          validate: (value) =>
+            !usedProfiles.includes(value) ||
+            "This profile is already used by another team",
         })}
         errorContent={errors?.profileNumber?.message}
         labelContent={"Profile Number"}
         containerClassName="mt-0!"
-
-        // maxLength={30}
       />
 
       <SubmitButton

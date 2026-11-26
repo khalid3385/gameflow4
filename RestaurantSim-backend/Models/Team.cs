@@ -11,6 +11,8 @@ public class Team
     public string JoinCode { get; set; } = string.Empty;
  
     public int ProfileNumber { get; set; }
+
+    public List<Goal> Goals { get; set; } = [];
  
     public GameSession GameSession { get; set; } = null!;
  

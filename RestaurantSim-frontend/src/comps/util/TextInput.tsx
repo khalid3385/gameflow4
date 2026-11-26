@@ -6,6 +6,8 @@ type FormCard = {
   errorContent: string;
   className?: string;
   type?: string;
+  min?: number;
+  max?: number;
   containerClassName?: string;
   registration?: Partial<UseFormRegisterReturn>; // react hook form registration
 };

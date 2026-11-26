@@ -237,6 +237,9 @@ namespace RestaurantSim.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("StartedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CreatorId");
@@ -245,6 +248,32 @@ namespace RestaurantSim.Migrations
                         .IsUnique();
 
                     b.ToTable("GameSessions");
+                });
+
+            modelBuilder.Entity("RestaurantSim.Models.Goal", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<bool>("IsChosen")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("TeamId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Goals");
                 });
 
             modelBuilder.Entity("RestaurantSim.Models.SessionParticipant", b =>
@@ -392,6 +421,17 @@ namespace RestaurantSim.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("RestaurantSim.Models.Goal", b =>
+                {
+                    b.HasOne("RestaurantSim.Models.Team", "Team")
+                        .WithMany("Goals")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+                });
+
             modelBuilder.Entity("RestaurantSim.Models.SessionParticipant", b =>
                 {
                     b.HasOne("RestaurantSim.Models.GameSession", null)
@@ -430,6 +470,8 @@ namespace RestaurantSim.Migrations
 
             modelBuilder.Entity("RestaurantSim.Models.Team", b =>
                 {
+                    b.Navigation("Goals");
+
                     b.Navigation("Members");
                 });
 #pragma warning restore 612, 618

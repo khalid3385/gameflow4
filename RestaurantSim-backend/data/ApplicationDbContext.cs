@@ -18,6 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     => Set<SessionParticipant>();
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
+    public DbSet<Goal> Goals => Set<Goal>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -48,7 +49,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             participant.HasOne<GameSession>()
                 .WithMany()
                 .HasForeignKey(p => p.GameSessionId)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<Team>(team =>
@@ -70,10 +71,10 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 .OnDelete(DeleteBehavior.Cascade);
 
             team.ToTable(table =>
-         {
-            table.HasCheckConstraint(
-                "CK_Teams_ProfileNumber",
-                "\"ProfileNumber\" >= 1 AND \"ProfileNumber\" <= 6");
+            {
+                table.HasCheckConstraint(
+                    "CK_Teams_ProfileNumber",
+                    "\"ProfileNumber\" >= 1 AND \"ProfileNumber\" <= 6");
             });
         });
 
@@ -86,7 +87,19 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             member.HasOne(m => m.Team)
                 .WithMany(t => t.Members)
                 .HasForeignKey(m => m.TeamId)
-             .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Goal>(goal =>
+        {
+            goal.Property(g => g.Description)
+                .IsRequired()
+                .HasMaxLength(200);
+
+            goal.HasOne(g => g.Team)
+                .WithMany(t => t.Goals)
+                .HasForeignKey(g => g.TeamId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

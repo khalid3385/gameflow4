@@ -20,6 +20,7 @@ export type JoinedTeam = {
   profileNumber: number;
   joinCode: string;
   members: TeamMember[];
+  gameStarted: boolean;
 };
 
 export default function JoinSession() {
@@ -60,6 +61,30 @@ export default function JoinSession() {
     return () => controller.abort();
   }, [savedCode]);
 
+  // Check every 3 seconds whether the host has started the game.
+  useEffect(() => {
+    if (!team || team.gameStarted) return;
+
+    const code = team.joinCode;
+    const interval = setInterval(async () => {
+      try {
+        const response = await lookupTeam(code);
+        if (!response.ok) return;
+
+        const fresh: JoinedTeam = await response.json();
+        if (fresh.gameStarted) {
+          setTeam((current) =>
+            current ? { ...current, gameStarted: true } : current,
+          );
+        }
+      } catch {
+        // Ignore: the next check tries again.
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [team?.joinCode, team?.gameStarted]);
+
   function rememberTeam(joined: JoinedTeam) {
     writeTabValue(JOIN_CODE_KEY, joined.joinCode);
     setTeam(joined);
@@ -91,6 +116,22 @@ export default function JoinSession() {
   }
 
   if (restoring) return <p role="status">Restoring your team...</p>;
+
+  if (team?.gameStarted) {
+    return (
+      <div className="flex flex-1 flex-col m-10 ">
+        <Card2 className="flex flex-col gap-5 flex-1">
+          <CardHeader
+            title="The game has started!"
+            size="lg"
+            align="left"
+            className="mb-2"
+            description={`Team ${team.name} (profile #${team.profileNumber}). Next step: come up with your goals.`}
+          />
+        </Card2>
+      </div>
+    );
+  }
 
   return !team ? (
     <div className="flex flex-1  items-center justify-center">
