@@ -1,0 +1,198 @@
+
+/* Hoofdcontainer van de restaurantprofielen */
+.restaurant-profiles {
+  width: 100%;
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Koppen */
+.restaurant-profiles h2 {
+  margin-bottom: 12px;
+}
+
+.restaurant-profiles h3 {
+  margin-top: 20px;
+  margin-bottom: 12px;
+}
+
+/* Knoppen om een restauranttype te kiezen */
+.restaurant-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+/* Standaard uiterlijk van een restaurantknop */
+.restaurant-toggle {
+  padding: 10px 16px;
+  border: 1px solid #888;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* Uiterlijk wanneer de gebruiker over een knop beweegt */
+.restaurant-toggle:hover {
+  background-color: #e5e5e5;
+  color: #222;
+}
+
+/* Uiterlijk van het geselecteerde restauranttype */
+.restaurant-toggle.active {
+  background-color: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* Container voor tabellen */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Algemene tabelinstellingen */
+.restaurant-profiles table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+}
+
+/* Cellen in de tabellen */
+.restaurant-profiles th,
+.restaurant-profiles td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+/* Koprij van de tabellen */
+.restaurant-profiles th {
+  font-weight: 600;
+  background-color: rgba(128, 128, 128, 0.1);
+}
+
+/* Totaal van de beginwaarden */
+.profile-total {
+  font-size: 17px;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+/* Totaal van de nieuwe waarden */
+.new-total {
+  font-size: 17px;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+/* Selectie van doelstellingen */
+.goal-selection {
+  margin-top: 25px;
+}
+
+/* Aantal geselecteerde doelstellingen */
+.selected-count {
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+/* Lijst met doelstellingen */
+.goal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 600px;
+}
+
+/* Een enkele doelstelling */
+.goal-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Uiterlijk wanneer de gebruiker over een doelstelling beweegt */
+.goal-option:hover {
+  background-color: rgba(128, 128, 128, 0.1);
+}
+
+/* Selectievakjes */
+.goal-option input {
+  width: 17px;
+  height: 17px;
+  cursor: pointer;
+}
+
+/* Beginwaarde rechts in de doelstellingenlijst */
+.goal-start-value {
+  margin-left: auto;
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* Resultaat van de berekening */
+.calculation-result {
+  margin-top: 25px;
+}
+
+/* Positieve verandering */
+.positive-change {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+/* Negatieve verandering */
+.negative-change {
+  color: #dc2626;
+  font-weight: bold;
+}
+
+/* Foutmelding */
+.calculation-error {
+  padding: 12px;
+  border: 1px solid #dc2626;
+  border-radius: 8px;
+  color: #dc2626;
+}
+
+/* Extra uitleg bij de berekening */
+.calculation-note {
+  font-size: 14px;
+  opacity: 0.75;
+  margin-top: 12px;
+}
+
+/* Aanpassingen voor kleinere schermen */
+@media (max-width: 600px) {
+  .restaurant-profiles {
+    padding: 12px;
+  }
+
+  /* Knoppen nemen op mobiel ongeveer de helft van de breedte in */
+  .restaurant-toggle {
+    flex: 1 1 calc(50% - 10px);
+  }
+
+  /* Tekst van de doelstellingen iets kleiner */
+  .goal-option {
+    font-size: 14px;
+  }
+
+  /* Tabellen krijgen kleinere cellen op mobiel */
+  .restaurant-profiles th,
+  .restaurant-profiles td {
+    padding: 8px;
+    font-size: 13px;
+  }
+}
